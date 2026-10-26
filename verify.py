@@ -129,5 +129,15 @@ dups = rows("SELECT commitment_id, step, COUNT(*) n FROM settlements GROUP BY 1,
 check("no settlement without an accepted commitment", not orphans and not dups,
       f"{len(orphans)} orphans, {len(dups)} duplicate steps")
 
+# ---- 6. money is conserved -----------------------------------------------------------------
+# Energy payments, penalties and bounties only move money between agents. The only places money
+# leaves the system are payments to the grid and bonds forfeited by auditors for invalid challenges.
+BOND = 50.0   # CHALLENGE_BOND_USD, restated not imported
+bonds = BOND * rows("SELECT COUNT(*) n FROM challenges WHERE verdict = 'invalid'")[0]["n"]
+net = sum(a["balance_usd"] for a in agents.values())
+grid_out = sum(s["grid_usd"] for s in settlements)
+check("money conserved", abs(net + grid_out + bonds) < 0.01,
+      f"sum of balances ${net:,.2f} vs -(grid payments ${grid_out:,.2f} + bonds ${bonds:,.2f})")
+
 print(f"\n{sum(results)}/{len(results)} checks passed")
 sys.exit(0 if all(results) else 1)

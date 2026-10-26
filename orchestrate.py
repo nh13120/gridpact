@@ -1,7 +1,8 @@
 """Run one GridPact day end to end: negotiation rounds -> settlement -> audit -> P&L.
 
-Usage:  python orchestrate.py           (negotiation + settlement + audit on the existing DB state)
-        python orchestrate.py --demo    (reset the DB first, then also run verify.py)
+Usage:  python orchestrate.py --demo    (reset the DB first, run the day, then run verify.py)
+        python orchestrate.py           (only on an EMPTY database: registration fails with
+                                         "already registered" if a previous run left state behind)
 """
 import math
 import subprocess
