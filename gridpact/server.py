@@ -277,9 +277,10 @@ def challenge(token: str, commitment_id: int, claim: str, evidence: str) -> dict
     c = conn_().execute("SELECT * FROM commitments WHERE commitment_id = ?", (commitment_id,)).fetchone()
     if not c:
         return {"ok": False, "reason": "no such commitment"}
-    from gridpact import settle  # Phase 4; imported here so the server starts even if it is missing
-    verdict = settle.adjudicate(conn_(), c, me["agent_id"], claim, evidence)
-    conn_().commit()
+    from gridpact import settle
+    with _write:  # adjudication reads and updates stake/reputation: serialise it like the other writes
+        verdict = settle.adjudicate(conn_(), c, me["agent_id"], claim, evidence)
+        conn_().commit()
     return {"ok": True, **verdict}
 
 

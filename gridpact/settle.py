@@ -28,7 +28,8 @@ def settle_day(conn, day):
     """Settle every active commitment against `day` (output of data.load_day). Returns rows written."""
     price_rt = day.groupby("step").price_usd_mwh.first()
     written = []
-    for c in conn.execute("SELECT * FROM commitments WHERE status = 'active'").fetchall():
+    # 'challenged' commitments still settle: a challenge adds a bounty, it does not cancel delivery duties.
+    for c in conn.execute("SELECT * FROM commitments WHERE status IN ('active', 'challenged')").fetchall():
         seller = conn.execute("SELECT * FROM agents WHERE agent_id = ?", (c["seller"],)).fetchone()
         power_cap = seller["bess_power_kw"] * STEP_H       # kWh the battery can add in one step
         energy_left = seller["bess_energy_kwh"]            # kWh it can add over the whole window

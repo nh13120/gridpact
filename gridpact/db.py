@@ -68,6 +68,8 @@ CREATE TABLE IF NOT EXISTS challenges (
     verdict         TEXT,                     -- valid | invalid
     bounty_usd      REAL NOT NULL DEFAULT 0
 );
+-- at most one valid challenge per commitment, enforced by SQLite even under concurrent calls
+CREATE UNIQUE INDEX IF NOT EXISTS one_valid_challenge ON challenges(commitment_id) WHERE verdict = 'valid';
 CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS ledger (
     seq          INTEGER PRIMARY KEY,
