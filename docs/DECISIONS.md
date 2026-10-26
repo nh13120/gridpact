@@ -15,3 +15,5 @@ One or two lines each. Newest at the bottom.
 - **Tool results are JSON text**: `mcp` 2.x returns a `dict` as `content[0].text`; clients `json.loads` it. Agents read it as text anyway.
 - **`find_counterparties` has no area filter** for HW6: the three physical agents were chosen as neighbours. Marked `ponytail:` in the code.
 - **Server DB connection is opened lazily** and with `check_same_thread=False`: MCP runs tools in worker threads, and the orchestrator resets the DB file before the server starts.
+- **Known limitation, identity**: anyone who registers an ID first owns it (token, not signature). Fine for a demo the orchestrator drives; the December version needs pre-shared keys or signatures. Role must match the agent type (a PVB can't register as buyer).
+- **Inputs must be finite** (`math.isfinite`): NaN compares False to everything and would slip past the cap check. Writes are serialised with one lock so two accepts can't both pass the cap.

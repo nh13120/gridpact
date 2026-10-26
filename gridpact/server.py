@@ -8,8 +8,10 @@ commitment is created.
 
 Run it:  python -m gridpact.server        (streamable HTTP on config.PORT)
 """
+import math
 import secrets
 import socket
+import threading
 import subprocess
 import sys
 import time
@@ -21,6 +23,14 @@ from gridpact.config import N_STEPS, OFFER_TTL_ROUNDS, PORT, STEP_H
 
 mcp = MCPServer("gridpact")
 _conn = None
+# ponytail: one global lock around every write tool. MCP runs tools in worker threads, so
+# without it two accepts could both pass the cap check. Per-seller locks if throughput matters.
+_write = threading.Lock()
+
+
+def _finite(*xs):
+    """True if every value is a real, finite number (NaN and inf would slip past < > checks)."""
+    return all(isinstance(x, (int, float)) and math.isfinite(x) for x in xs)
 
 
 def conn_():
@@ -83,6 +93,10 @@ def register_agent(agent_id: str, role: str, declared_flex_kw: float | None = No
     m = meta.loc[agent_id] if meta is not None and len(meta) else None
     if role != "auditor" and m is None:
         return {"ok": False, "reason": f"{agent_id} is not one of this run's physical agents {list(data.AGENTS)}"}
+    if declared_flex_kw is not None and not (_finite(declared_flex_kw) and declared_flex_kw > 0):
+        return {"ok": False, "reason": "declared_flex_kw must be a finite number > 0"}
+    if m is not None and role != {"community": "buyer", "pv_bess": "seller"}[m.entity_type]:
+        return {"ok": False, "reason": f"{agent_id} is a {m.entity_type}; it must register as the matching role"}
     flex = float(declared_flex_kw) if declared_flex_kw is not None else (float(m.flex_up_kw) if m is not None else 0.0)
     cap = flex * STEP_H  # kWh per step the agent may commit
     token = secrets.token_hex(8)
@@ -132,9 +146,14 @@ def propose(token: str, to: str, step_from: int, step_to: int, kwh_per_step: flo
         return {"ok": False, "reason": "a trade needs exactly one buyer and one seller"}
     if not (0 <= step_from <= step_to < N_STEPS):
         return {"ok": False, "reason": f"steps must satisfy 0 <= step_from <= step_to < {N_STEPS}"}
-    if kwh_per_step <= 0 or price_usd_mwh <= 0 or penalty_usd_mwh < 0:
-        return {"ok": False, "reason": "kwh_per_step and price must be > 0, penalty >= 0"}
+    if not _finite(kwh_per_step, price_usd_mwh, penalty_usd_mwh) or kwh_per_step <= 0 or price_usd_mwh <= 0 or penalty_usd_mwh < 0:
+        return {"ok": False, "reason": "kwh_per_step and price must be finite and > 0, penalty finite and >= 0"}
     seller = me if me["role"] == "seller" else other
+    with _write:
+        return _propose_locked(me, seller, to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh)
+
+
+def _propose_locked(me, seller, to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh):
     room = seller["trade_cap_kwh"] - _committed_kwh(seller["agent_id"], step_from, step_to)
     if kwh_per_step > room + 1e-9:
         return {"ok": False, "reason": f"{seller['agent_id']} can commit at most {room:.0f} kWh/step in that window"}
@@ -164,7 +183,13 @@ def respond(token: str, offer_id: int, action: str, counter_price_usd_mwh: float
         return {"ok": False, "reason": f"offer is {offer['status']}"}
     if action not in ("accept", "reject", "counter"):
         return {"ok": False, "reason": "action must be accept, reject or counter"}
+    if counter_price_usd_mwh is not None and not _finite(counter_price_usd_mwh):
+        return {"ok": False, "reason": "counter_price_usd_mwh must be a finite number"}
+    with _write:
+        return _respond_locked(me, offer, offer_id, action, counter_price_usd_mwh)
 
+
+def _respond_locked(me, offer, offer_id, action, counter_price_usd_mwh):
     if action == "reject":
         conn_().execute("UPDATE offers SET status = 'rejected' WHERE offer_id = ?", (offer_id,))
         return {"ok": True, "ledger_seq": _log(me["agent_id"], "reject", {"offer_id": offer_id})}
