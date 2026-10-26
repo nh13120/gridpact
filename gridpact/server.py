@@ -66,7 +66,7 @@ def _round():
 def _committed_kwh(seller, step_from, step_to):
     """Largest per-step kWh this seller has already committed inside the window."""
     rows = conn_().execute(
-        "SELECT kwh_per_step FROM commitments WHERE seller = ? AND status = 'active' "
+        "SELECT kwh_per_step FROM commitments WHERE seller = ? AND status IN ('active', 'challenged') "
         "AND NOT (step_to < ? OR step_from > ?)", (seller, step_from, step_to)).fetchall()
     return sum(r["kwh_per_step"] for r in rows)
 
