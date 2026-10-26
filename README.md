@@ -27,7 +27,8 @@ python -m gridpact.data     # Phase 0: prints the chosen day for the 3 physical 
 pytest                      # Phase 1+: unit tests (ledger hash chain)
 python -m gridpact.server   # Phase 2: run the MCP server (http://127.0.0.1:8765/mcp)
 python -m tests.smoke_client  # Phase 2: start server + walk one trade without an LLM
-python orchestrate.py --demo  # Phase 3+: reset DB, run the day with 4 Haiku agents (~$0.01)
+python orchestrate.py --demo  # the one command: reset DB, run the day with 4 Haiku agents (~$0.01), verify
+python verify.py              # re-check the last run independently
 ```
 
 (More commands are added as phases land. The final one-shot demo is `python orchestrate.py --demo`.)
@@ -49,7 +50,8 @@ python orchestrate.py --demo  # Phase 3+: reset DB, run the day with 4 Haiku age
 | `tests/smoke_client.py` | no-LLM check: register -> find -> propose -> accept over MCP |
 | `agents/prompts/*.md` | system prompts: buyer, honest_seller, liar (adversarial test agent), auditor |
 | `agents/run_agent.py` | one agent turn via the Claude Agent SDK; logs tool calls to `runs/<ts>/transcript.jsonl` |
-| `orchestrate.py` | the whole day: owners register -> negotiation rounds -> settlement -> audit -> P&L |
+| `orchestrate.py` | the whole day: owners register -> negotiation rounds -> settlement -> audit -> P&L; `--demo` resets and verifies |
+| `verify.py` | independent checks (no `gridpact` imports): hash chain, settlements from raw data, truth columns, economics |
 
 ## Limitations and next steps
 

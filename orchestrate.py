@@ -4,6 +4,7 @@ Usage:  python orchestrate.py           (negotiation + settlement + audit on the
         python orchestrate.py --demo    (reset the DB first, then also run verify.py)
 """
 import math
+import subprocess
 import sys
 
 from gridpact import data, db, server, settle
@@ -40,6 +41,7 @@ def main(demo=False):
         # --- facts from the data (obs columns only) --------------------------------
         day = data.load_day()
         meta = data.load_metadata()
+        c = db.connect(); c.execute("INSERT OR REPLACE INTO kv VALUES ('day', ?)", (data.DAY,)); c.commit(); c.close()
         window = day[day.step.between(STEP_FROM, STEP_TO)]
         need = window[window.entity_id == BUYER].deficit_kwh.mean()
         da = window.price_da_usd_mwh.mean()
@@ -136,6 +138,9 @@ def main(demo=False):
         print(f"\nLLM cost: ${total_cost:.3f}")
     finally:
         proc.terminate()
+    if demo:
+        print("\n----- independent verification (verify.py) -----", flush=True)
+        sys.exit(subprocess.run([sys.executable, "verify.py"]).returncode)
 
 
 if __name__ == "__main__":

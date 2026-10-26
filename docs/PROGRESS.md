@@ -7,8 +7,8 @@ Check the phase's "done when" command before ticking it. Details in `PLAN.md`.
 - [x] Phase 2 - MCP server with 7 tools. Check: `python -m tests.smoke_client`
 - [x] Phase 3 - LLM agents + orchestration. Check: `python orchestrate.py --demo` (needs ANTHROPIC_API_KEY; ~$0.01)
 - [x] Phase 4 - settlement + challenge adjudication. Check: `python orchestrate.py --demo` (liar: shortfall, valid challenge, reputation 0.5)
-- [ ] Phase 5 - independent `verify.py` + `python orchestrate.py --demo`
+- [x] Phase 5 - independent `verify.py` + `python orchestrate.py --demo` (6/6 checks)
 - [ ] Phase 6 - README complete, fresh-clone test, GitHub
 
 ## What's next
-Phase 5: `verify.py` (independent checks 1-5, no imports from gridpact/), `--demo` runs it at the end.
+Phase 6: finish README (limitations, next steps), fresh-clone test, GitHub repo (private, with approval).
