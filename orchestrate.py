@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 from gridpact import data, db, server, settle
-from gridpact.config import GRID_FEE_USD_MWH, STEP_H
+from gridpact.config import GRID_FEE_USD_MWH, ROOT, STEP_H
 from agents.run_agent import run
 
 BUYER, HONEST, LIAR, AUDITOR = "COM_09", "PVB_17", "PVB_37", "AUD_01"
@@ -41,7 +41,8 @@ def main(demo=False):
         # --- facts from the data (obs columns only) --------------------------------
         day = data.load_day()
         meta = data.load_metadata()
-        c = db.connect(); c.execute("INSERT OR REPLACE INTO kv VALUES ('day', ?)", (data.DAY,)); c.commit(); c.close()
+        settled_day = str(day.timestamp.min().tz_convert(data.TZ).date())   # the day verify.py must price against
+        c = db.connect(); c.execute("INSERT OR REPLACE INTO kv VALUES ('day', ?)", (settled_day,)); c.commit(); c.close()
         window = day[day.step.between(STEP_FROM, STEP_TO)]
         need = window[window.entity_id == BUYER].deficit_kwh.mean()
         da = window.price_da_usd_mwh.mean()
@@ -140,7 +141,7 @@ def main(demo=False):
         proc.terminate()
     if demo:
         print("\n----- independent verification (verify.py) -----", flush=True)
-        sys.exit(subprocess.run([sys.executable, "verify.py"]).returncode)
+        sys.exit(subprocess.run([sys.executable, str(ROOT / "verify.py")]).returncode)
 
 
 if __name__ == "__main__":

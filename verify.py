@@ -19,7 +19,10 @@ load_dotenv(ROOT / ".env")
 DATA = Path(os.environ.get("GRIDPACT_DATA_DIR", ROOT / "data"))
 TZ, STEP_H, GRID_FEE, TOLERANCE = "America/Chicago", 0.25, 30.0, 1.10   # restated, not imported
 
-conn = sqlite3.connect(ROOT / "gridpact.db")
+DB = ROOT / "gridpact.db"
+if not DB.exists():
+    sys.exit(f"FAIL: {DB} not found. Run `python orchestrate.py --demo` first.")
+conn = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)   # read-only: the verifier never writes
 conn.row_factory = sqlite3.Row
 rows = lambda sql, *a: conn.execute(sql, a).fetchall()
 results = []
@@ -43,25 +46,36 @@ n = rows("SELECT COUNT(*) n FROM ledger")[0]["n"]
 check("ledger hash chain", bad is None, f"{n} entries, " + ("intact" if bad is None else f"broken at seq {bad}"))
 
 # ---- raw data for the day -------------------------------------------------------------
-day = rows("SELECT value FROM kv WHERE key = 'day'")[0]["value"]
+day_row = rows("SELECT value FROM kv WHERE key = 'day'")
+if not day_row:
+    sys.exit("FAIL: no settled day in the database (kv.day missing). Run `python orchestrate.py --demo` first.")
+day = day_row[0]["value"]
 start = pd.Timestamp(day, tz=TZ).tz_convert("UTC")
 prices = pd.read_parquet(DATA / "system_prices_and_load_2023_15min.parquet", columns=["price_usd_mwh"])
 rt = {s: float(prices.price_usd_mwh[start + pd.Timedelta(minutes=15 * s)]) for s in range(96)}
 meta = pd.read_parquet(DATA / "agents_metadata.parquet").set_index("entity_id")
 agents = {r["agent_id"]: r for r in rows("SELECT * FROM agents")}
-commitments = rows("SELECT * FROM commitments WHERE status IN ('active', 'challenged')")
+commitments = rows("SELECT * FROM commitments WHERE status IN ('active', 'challenged') ORDER BY commitment_id")
 settlements = rows("SELECT * FROM settlements ORDER BY commitment_id, step")
+by_key = {(s["commitment_id"], s["step"]): s for s in settlements}
 
-# ---- 2. recompute every settlement from raw data ---------------------------------------
+# ---- 2. recompute every settlement from raw data (every step of every commitment) -----
 mismatch, stake_left = [], {a: 0.0 for a in agents}
+power_left, energy_left = {}, {}          # shared per seller, like a real battery
 for c in commitments:
     stake_left[c["seller"]] += c["stake_usd"]
 for c in commitments:
-    m = meta.loc[c["seller"]]
-    energy_left = float(m.bess_energy_kwh)
-    for s in [x for x in settlements if x["commitment_id"] == c["commitment_id"]]:
-        delivered = min(c["kwh_per_step"], float(m.bess_power_kw) * STEP_H, energy_left)
-        energy_left -= delivered
+    m, sid = meta.loc[c["seller"]], c["seller"]
+    energy_left.setdefault(sid, float(m.bess_energy_kwh))
+    for step in range(c["step_from"], c["step_to"] + 1):
+        s = by_key.get((c["commitment_id"], step))
+        if s is None:
+            mismatch.append((c["commitment_id"], step, "missing settlement row"))
+            continue
+        power_left.setdefault((sid, step), float(m.bess_power_kw) * STEP_H)
+        delivered = min(c["kwh_per_step"], power_left[(sid, step)], energy_left[sid])
+        power_left[(sid, step)] -= delivered
+        energy_left[sid] -= delivered
         short = c["kwh_per_step"] - delivered
         want = {"delivered_kwh": delivered, "energy_usd": delivered / 1000 * c["price_usd_mwh"],
                 "penalty_usd": min(short / 1000 * c["penalty_usd_mwh"], stake_left[c["seller"]]),
@@ -79,14 +93,14 @@ truth = pd.read_parquet(DATA / "agents_timeseries_2023_15min.parquet", columns=[
                         filters=[("entity_id", "in", [s["agent_id"] for s in sellers])])
 details, ok3 = [], True
 for s in sellers:
-    real = float(meta.loc[s["agent_id"]].flex_up_kw)                       # honest envelope
-    seen = float(truth.xs(s["agent_id"], level="entity_id").bess_power_true_kw.abs().max())  # truth column
+    envelope = float(meta.loc[s["agent_id"]].flex_up_kw)                   # registry envelope (could be corrupted)
+    real = float(truth.xs(s["agent_id"], level="entity_id").bess_power_true_kw.abs().max())  # TRUTH: power the battery really reached
     lied = s["declared_flex_kw"] > TOLERANCE * real
     challenged = bool(rows("SELECT 1 FROM challenges ch JOIN commitments c USING (commitment_id) "
                            "WHERE c.seller = ? AND ch.verdict = 'valid'", s["agent_id"]))
     ok3 &= (lied == challenged)
-    details.append(f"{s['agent_id']} declared {s['declared_flex_kw']:.0f} kW vs real envelope {real:.0f} kW "
-                   f"(max true battery power all year {seen:.0f} kW) -> {'LIED' if lied else 'honest'}, "
+    details.append(f"{s['agent_id']} declared {s['declared_flex_kw']:.0f} kW vs true max battery power {real:.0f} kW "
+                   f"(registry envelope {envelope:.0f} kW) -> {'LIED' if lied else 'honest'}, "
                    f"{'challenged' if challenged else 'not challenged'}")
 check("truth columns agree with the verdicts", ok3, "; ".join(details))
 
@@ -95,7 +109,8 @@ paid = sum(s["energy_usd"] + s["grid_usd"] - s["penalty_usd"] for s in settlemen
 grid_only = sum(s["committed_kwh"] / 1000 * (rt[s["step"]] + GRID_FEE) for s in settlements)
 check("buyer pays less than grid-only", paid < grid_only, f"paid ${paid:,.0f} vs grid-only ${grid_only:,.0f}")
 
-liars = [s for s in sellers if s["declared_flex_kw"] > TOLERANCE * float(meta.loc[s["agent_id"]].flex_up_kw)]
+liars = [s for s in sellers if s["declared_flex_kw"] > TOLERANCE *
+         float(truth.xs(s["agent_id"], level="entity_id").bess_power_true_kw.abs().max())]
 for s in liars:
     mine = [c for c in commitments if c["seller"] == s["agent_id"]]
     actual = sum(x["energy_usd"] - x["penalty_usd"] for x in settlements if x["commitment_id"] in {c["commitment_id"] for c in mine})
@@ -107,7 +122,8 @@ for s in liars:
 
 # ---- 5. every settlement has an accepted commitment, once per step -----------------------
 orphans = rows("SELECT s.id FROM settlements s LEFT JOIN commitments c USING (commitment_id) "
-               "LEFT JOIN offers o ON o.offer_id = c.offer_id WHERE c.commitment_id IS NULL OR o.status != 'accepted' "
+               "LEFT JOIN offers o ON o.offer_id = c.offer_id WHERE c.commitment_id IS NULL OR o.offer_id IS NULL "
+               "OR o.status != 'accepted' "
                "OR s.step < c.step_from OR s.step > c.step_to")
 dups = rows("SELECT commitment_id, step, COUNT(*) n FROM settlements GROUP BY 1, 2 HAVING n > 1")
 check("no settlement without an accepted commitment", not orphans and not dups,

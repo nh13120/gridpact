@@ -8,7 +8,7 @@ Check the phase's "done when" command before ticking it. Details in `PLAN.md`.
 - [x] Phase 3 - LLM agents + orchestration. Check: `python orchestrate.py --demo` (needs ANTHROPIC_API_KEY; ~$0.01)
 - [x] Phase 4 - settlement + challenge adjudication. Check: `python orchestrate.py --demo` (liar: shortfall, valid challenge, reputation 0.5)
 - [x] Phase 5 - independent `verify.py` + `python orchestrate.py --demo` (6/6 checks)
-- [ ] Phase 6 - README complete, fresh-clone test, GitHub
+- [x] Phase 6 - README complete, code review fixes, fresh-clone test; GitHub repo pending approval
 
 ## What's next
-Phase 6: finish README (limitations, next steps), fresh-clone test, GitHub repo (private, with approval).
+Hand-off: Nicolas creates the private GitHub repo and adds Maheen. Then December work (see README "Next steps").

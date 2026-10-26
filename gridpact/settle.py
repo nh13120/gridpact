@@ -28,15 +28,19 @@ def settle_day(conn, day):
     """Settle every active commitment against `day` (output of data.load_day). Returns rows written."""
     price_rt = day.groupby("step").price_usd_mwh.first()
     written = []
+    power_left, energy_left = {}, {}   # per (seller, step) kWh and per seller kWh, shared by all its commitments
     # 'challenged' commitments still settle: a challenge adds a bounty, it does not cancel delivery duties.
-    for c in conn.execute("SELECT * FROM commitments WHERE status IN ('active', 'challenged')").fetchall():
+    for c in conn.execute("SELECT * FROM commitments WHERE status IN ('active', 'challenged') "
+                          "ORDER BY commitment_id").fetchall():
         seller = conn.execute("SELECT * FROM agents WHERE agent_id = ?", (c["seller"],)).fetchone()
-        power_cap = seller["bess_power_kw"] * STEP_H       # kWh the battery can add in one step
-        energy_left = seller["bess_energy_kwh"]            # kWh it can add over the whole window
+        sid = seller["agent_id"]
+        energy_left.setdefault(sid, seller["bess_energy_kwh"])             # kWh over the whole day
         for step in range(c["step_from"], c["step_to"] + 1):
+            power_left.setdefault((sid, step), seller["bess_power_kw"] * STEP_H)  # kWh in this step
             committed = c["kwh_per_step"]
-            delivered = min(committed, power_cap, energy_left)
-            energy_left -= delivered
+            delivered = min(committed, power_left[(sid, step)], energy_left[sid])
+            power_left[(sid, step)] -= delivered
+            energy_left[sid] -= delivered
             shortfall = committed - delivered
             energy_usd = delivered / 1000 * c["price_usd_mwh"]
             stake_left = conn.execute("SELECT stake_locked_usd FROM agents WHERE agent_id = ?",

@@ -19,7 +19,7 @@ import time
 from mcp.server import MCPServer
 
 from gridpact import data, db, ledger
-from gridpact.config import N_STEPS, OFFER_TTL_ROUNDS, PORT, STEP_H
+from gridpact.config import N_STEPS, OFFER_TTL_ROUNDS, PORT, ROOT, STEP_H
 
 mcp = MCPServer("gridpact")
 _conn = None
@@ -300,8 +300,8 @@ def set_round(n):
 
 def launch(timeout=15):
     """Start the server as a subprocess and wait until the port answers. Returns the Popen."""
-    proc = subprocess.Popen([sys.executable, "-m", "gridpact.server"],
-                            stdout=subprocess.DEVNULL, stderr=open("server.log", "w"))  # errors land in server.log
+    proc = subprocess.Popen([sys.executable, "-m", "gridpact.server"], cwd=ROOT,  # importable from any cwd
+                            stdout=subprocess.DEVNULL, stderr=open(ROOT / "server.log", "w"))  # errors land in server.log
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:
