@@ -186,10 +186,14 @@ def respond(token: str, offer_id: int, action: str, counter_price_usd_mwh: float
     if counter_price_usd_mwh is not None and not _finite(counter_price_usd_mwh):
         return {"ok": False, "reason": "counter_price_usd_mwh must be a finite number"}
     with _write:
-        return _respond_locked(me, offer, offer_id, action, counter_price_usd_mwh)
+        return _respond_locked(me, offer_id, action, counter_price_usd_mwh)
 
 
-def _respond_locked(me, offer, offer_id, action, counter_price_usd_mwh):
+def _respond_locked(me, offer_id, action, counter_price_usd_mwh):
+    # Re-read under the lock: another thread may have answered this offer meanwhile.
+    offer = conn_().execute("SELECT * FROM offers WHERE offer_id = ?", (offer_id,)).fetchone()
+    if offer["status"] != "open":
+        return {"ok": False, "reason": f"offer is {offer['status']}"}
     if action == "reject":
         conn_().execute("UPDATE offers SET status = 'rejected' WHERE offer_id = ?", (offer_id,))
         return {"ok": True, "ledger_seq": _log(me["agent_id"], "reject", {"offer_id": offer_id})}

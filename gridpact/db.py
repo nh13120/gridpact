@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS offers (
 );
 CREATE TABLE IF NOT EXISTS commitments (
     commitment_id   INTEGER PRIMARY KEY,
-    offer_id        INTEGER NOT NULL,
+    offer_id        INTEGER NOT NULL UNIQUE,   -- one commitment per offer, enforced by SQLite
     seller          TEXT NOT NULL,
     buyer           TEXT NOT NULL,
     step_from       INTEGER NOT NULL,
