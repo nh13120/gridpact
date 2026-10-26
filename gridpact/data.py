@@ -10,7 +10,7 @@ from gridpact.config import DATA_DIR, TZ
 
 DAY = "2023-06-19"  # local date; chosen in docs/DATA_NOTES.md
 AGENTS = {"COM_09": "buyer", "PVB_17": "honest_seller", "PVB_37": "liar"}
-STEP_H = 0.25  # one 15-minute step, in hours
+from gridpact.config import STEP_H  # noqa: E402  (one 15-minute step, in hours)
 
 META_COLS = ["entity_id", "entity_type", "bus", "lat", "lon", "bess_power_kw",
              "bess_energy_kwh", "flex_up_kw", "flex_down_kw", "flex_duration_h"]

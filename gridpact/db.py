@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS challenges (
     verdict         TEXT,                     -- valid | invalid
     bounty_usd      REAL NOT NULL DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS ledger (
     seq          INTEGER PRIMARY KEY,
     ts           TEXT NOT NULL,
@@ -82,7 +83,8 @@ CREATE TABLE IF NOT EXISTS ledger (
 
 def connect(path=DB_PATH):
     """Open (and create if needed) the database. Callers must conn.commit() after writes."""
-    conn = sqlite3.connect(path)
+    # check_same_thread=False: the MCP server calls tools from worker threads
+    conn = sqlite3.connect(path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
     return conn

@@ -11,3 +11,7 @@ One or two lines each. Newest at the bottom.
 - **Liar = honest data + inflated declared envelope** stored at `register_agent`. Swap for ENGIE's malicious dataset later behind the same field.
 - **Stake, reputation, balance are columns on `agents`**, not separate tables: one row per agent is easier to read and update. A `challenges` table was added since Phase 4 needs it.
 - **Ledger hash covers the whole entry** (seq, ts, agent, action, payload), not just the payload, so editing any field is caught.
+- **Stake is locked at acceptance**, not at proposal: one place to compute it (`penalty x kWh x steps`), and a rejected offer never ties up money.
+- **Tool results are JSON text**: `mcp` 2.x returns a `dict` as `content[0].text`; clients `json.loads` it. Agents read it as text anyway.
+- **`find_counterparties` has no area filter** for HW6: the three physical agents were chosen as neighbours. Marked `ponytail:` in the code.
+- **Server DB connection is opened lazily** and with `check_same_thread=False`: MCP runs tools in worker threads, and the orchestrator resets the DB file before the server starts.

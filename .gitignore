@@ -7,3 +7,4 @@ data/*
 !data/README.md
 .pytest_cache/
 .DS_Store
+server.log

@@ -25,6 +25,8 @@ Data: put the ENGIE parquet files in `data/` (see `data/README.md`), or set `GRI
 ```bash
 python -m gridpact.data     # Phase 0: prints the chosen day for the 3 physical agents
 pytest                      # Phase 1+: unit tests (ledger hash chain)
+python -m gridpact.server   # Phase 2: run the MCP server (http://127.0.0.1:8765/mcp)
+python -m tests.smoke_client  # Phase 2: start server + walk one trade without an LLM
 ```
 
 (More commands are added as phases land. The final one-shot demo is `python orchestrate.py --demo`.)
@@ -41,6 +43,8 @@ pytest                      # Phase 1+: unit tests (ledger hash chain)
 | `gridpact/data.py` | loads one day of ENGIE data (obs columns only) |
 | `gridpact/db.py` | SQLite tables (agents, offers, commitments, settlements, challenges, ledger) |
 | `gridpact/ledger.py` | append-only hash-chained log; `verify_chain()` finds the first tampered entry |
+| `gridpact/server.py` | the MCP server: 7 tools agents call, rules enforced server-side |
+| `tests/smoke_client.py` | no-LLM check: register -> find -> propose -> accept over MCP |
 
 ## Limitations and next steps
 
