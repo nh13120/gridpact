@@ -9,3 +9,5 @@ One or two lines each. Newest at the bottom.
 - **Delivery = metadata battery limits, not re-simulated dispatch**: `min(committed, bess_power_kw x 0.25)` per step. Honest about it in the README as the limitation.
 - **Price spread**: one grid fee (30 $/MWh) on imports. The proposal sweeps spreads; one value is enough for HW6.
 - **Liar = honest data + inflated declared envelope** stored at `register_agent`. Swap for ENGIE's malicious dataset later behind the same field.
+- **Stake, reputation, balance are columns on `agents`**, not separate tables: one row per agent is easier to read and update. A `challenges` table was added since Phase 4 needs it.
+- **Ledger hash covers the whole entry** (seq, ts, agent, action, payload), not just the payload, so editing any field is caught.

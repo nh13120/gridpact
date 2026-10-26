@@ -24,6 +24,7 @@ Data: put the ENGIE parquet files in `data/` (see `data/README.md`), or set `GRI
 
 ```bash
 python -m gridpact.data     # Phase 0: prints the chosen day for the 3 physical agents
+pytest                      # Phase 1+: unit tests (ledger hash chain)
 ```
 
 (More commands are added as phases land. The final one-shot demo is `python orchestrate.py --demo`.)
@@ -38,6 +39,8 @@ python -m gridpact.data     # Phase 0: prints the chosen day for the 3 physical 
 | `docs/PROGRESS.md` | phase checklist and what's next |
 | `gridpact/config.py` | settings read from `.env` |
 | `gridpact/data.py` | loads one day of ENGIE data (obs columns only) |
+| `gridpact/db.py` | SQLite tables (agents, offers, commitments, settlements, challenges, ledger) |
+| `gridpact/ledger.py` | append-only hash-chained log; `verify_chain()` finds the first tampered entry |
 
 ## Limitations and next steps
 

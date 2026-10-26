@@ -3,7 +3,7 @@
 Check the phase's "done when" command before ticking it. Details in `PLAN.md`.
 
 - [x] Phase 0 - repo setup + data inspection. Check: `python -m gridpact.data`
-- [ ] Phase 1 - SQLite state + hash-chained ledger. Check: `pytest tests/test_ledger.py`
+- [x] Phase 1 - SQLite state + hash-chained ledger. Check: `pytest tests/test_ledger.py`
 - [ ] Phase 2 - MCP server with 7 tools. Check: `python tests/smoke_client.py`
 - [ ] Phase 3 - LLM agents + orchestration. Check: `python orchestrate.py`
 - [ ] Phase 4 - settlement + challenge adjudication
@@ -11,4 +11,4 @@ Check the phase's "done when" command before ticking it. Details in `PLAN.md`.
 - [ ] Phase 6 - README complete, fresh-clone test, GitHub
 
 ## What's next
-Phase 1: `gridpact/db.py`, `gridpact/ledger.py`, `tests/test_ledger.py`.
+Phase 2: `gridpact/server.py` (7 MCP tools over streamable HTTP) and `tests/smoke_client.py`.
