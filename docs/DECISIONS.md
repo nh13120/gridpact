@@ -17,3 +17,7 @@ One or two lines each. Newest at the bottom.
 - **Server DB connection is opened lazily** and with `check_same_thread=False`: MCP runs tools in worker threads, and the orchestrator resets the DB file before the server starts.
 - **Known limitation, identity**: anyone who registers an ID first owns it (token, not signature). Fine for a demo the orchestrator drives; the December version needs pre-shared keys or signatures. Role must match the agent type (a PVB can't register as buyer).
 - **Inputs must be finite** (`math.isfinite`): NaN compares False to everything and would slip past the cap check. Writes are serialised with one lock so two accepts can't both pass the cap.
+- **Owners register agents, not the LLMs.** First run: Haiku playing the liar refused to register an inflated envelope. Now the orchestrator (the "owner") registers each agent with its declared envelope (liar = 2x real), which also mirrors ENGIE's malicious dataset corrupting what an agent reports. The liar LLM is framed as the scripted adversarial seller in a fraud-detection test and sells into the inflated cap; Haiku accepts that framing.
+- **Register before the buyer's first turn**: the first run wasted a round because the buyer went first and found no sellers.
+- **Trade caps are whole kWh** (`floor`): the LLM proposed 1364 against a cap of 1363.66 and got refused.
+- **Agent SDK settings**: `tools=[]` (no built-in tools), `allowed_tools=["mcp__gridpact__*"]`, `setting_sources=[]` (ignore ~/.claude), `max_turns=8`, `max_budget_usd=2`. A full day costs about a cent on Haiku 5.5.

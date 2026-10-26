@@ -98,7 +98,7 @@ def register_agent(agent_id: str, role: str, declared_flex_kw: float | None = No
     if m is not None and role != {"community": "buyer", "pv_bess": "seller"}[m.entity_type]:
         return {"ok": False, "reason": f"{agent_id} is a {m.entity_type}; it must register as the matching role"}
     flex = float(declared_flex_kw) if declared_flex_kw is not None else (float(m.flex_up_kw) if m is not None else 0.0)
-    cap = flex * STEP_H  # kWh per step the agent may commit
+    cap = math.floor(flex * STEP_H)  # whole kWh per step the agent may commit (floor: no 1363.66 caps)
     token = secrets.token_hex(8)
     conn_().execute(
         "INSERT INTO agents (agent_id, role, token, bus, bess_power_kw, bess_energy_kwh, "
@@ -156,7 +156,7 @@ def propose(token: str, to: str, step_from: int, step_to: int, kwh_per_step: flo
 def _propose_locked(me, seller, to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh):
     room = seller["trade_cap_kwh"] - _committed_kwh(seller["agent_id"], step_from, step_to)
     if kwh_per_step > room + 1e-9:
-        return {"ok": False, "reason": f"{seller['agent_id']} can commit at most {room:.0f} kWh/step in that window"}
+        return {"ok": False, "reason": f"{seller['agent_id']} can commit at most {math.floor(room)} kWh/step in that window"}
     cur = conn_().execute(
         "INSERT INTO offers (from_agent, to_agent, step_from, step_to, kwh_per_step, "
         "price_usd_mwh, penalty_usd_mwh, round_opened) VALUES (?,?,?,?,?,?,?,?)",
