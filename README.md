@@ -45,6 +45,7 @@ python orchestrate.py --demo  # Phase 3+: reset DB, run the day with 4 Haiku age
 | `gridpact/db.py` | SQLite tables (agents, offers, commitments, settlements, challenges, ledger) |
 | `gridpact/ledger.py` | append-only hash-chained log; `verify_chain()` finds the first tampered entry |
 | `gridpact/server.py` | the MCP server: 7 tools agents call, rules enforced server-side |
+| `gridpact/settle.py` | deterministic 15-min settlement and challenge adjudication (no LLM) |
 | `tests/smoke_client.py` | no-LLM check: register -> find -> propose -> accept over MCP |
 | `agents/prompts/*.md` | system prompts: buyer, honest_seller, liar (adversarial test agent), auditor |
 | `agents/run_agent.py` | one agent turn via the Claude Agent SDK; logs tool calls to `runs/<ts>/transcript.jsonl` |

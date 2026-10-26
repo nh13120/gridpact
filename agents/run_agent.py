@@ -41,6 +41,7 @@ async def run_turn(name, role_file, task, max_turns=8):
         setting_sources=[],                   # ignore ~/.claude settings and CLAUDE.md files
         max_turns=max_turns,
         max_budget_usd=2.0,
+        stderr=lambda line: log({"agent": name, "event": "stderr", "text": line}),
     )
     print(f"\n=== {name} ===")
     log({"agent": name, "event": "task", "text": task})

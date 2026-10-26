@@ -3,10 +3,11 @@
 Usage:  python orchestrate.py           (negotiation + settlement + audit on the existing DB state)
         python orchestrate.py --demo    (reset the DB first, then also run verify.py)
 """
+import math
 import sys
 
-from gridpact import data, db, server
-from gridpact.config import GRID_FEE_USD_MWH
+from gridpact import data, db, server, settle
+from gridpact.config import GRID_FEE_USD_MWH, STEP_H
 from agents.run_agent import run
 
 BUYER, HONEST, LIAR, AUDITOR = "COM_09", "PVB_17", "PVB_37", "AUD_01"
@@ -81,10 +82,11 @@ def main(demo=False):
                     continue
                 m = meta.loc[seller]
                 tok = token_of(seller)
+                # The honest seller knows its true envelope. The "liar" is only told its registered cap:
+                # the lie is in the owner's registration, not in the LLM (see DECISIONS.md).
                 envelope = (f"Your declared envelope is {m.flex_up_kw:.0f} kW, which is your true battery power."
                             if role_file == "honest_seller.md" else
-                            f"Your owner registered a declared envelope of {2 * m.flex_up_kw:.0f} kW; the real "
-                            f"battery is {m.bess_power_kw:.0f} kW.")
+                            f"Your registered trade cap is {math.floor(2 * m.flex_up_kw * STEP_H)} kWh per step.")
                 task = (f"You are {seller}, token {tok}. Round {rnd}. {envelope} Check your inbox and answer "
                         f"every open offer. Your minimum price is {da:.0f} $/MWh (wholesale). {facts}")
                 _, c = run(seller, role_file, task); total_cost += c
@@ -97,7 +99,41 @@ def main(demo=False):
             print(f"  #{r['commitment_id']} {r['seller']} -> {r['buyer']}: {r['kwh_per_step']:.0f} kWh/step "
                   f"x {r['step_to'] - r['step_from'] + 1} steps @ {r['price_usd_mwh']:.0f} $/MWh, "
                   f"penalty {r['penalty_usd_mwh']:.0f}, stake ${r['stake_usd']:.0f}")
-        print(f"\nLLM cost so far: ${total_cost:.3f}")
+
+        # --- delivery day: deterministic settlement every 15 minutes ----------------
+        print("\n----- settlement (deterministic) -----")
+        c = db.connect()
+        rows = settle.settle_day(c, day)
+        c.close()
+        for cid in sorted({r["commitment_id"] for r in rows}):
+            rs = [r for r in rows if r["commitment_id"] == cid]
+            print(f"  commitment #{cid}: committed {sum(r['committed_kwh'] for r in rs):,.0f} kWh, "
+                  f"delivered {sum(r['delivered_kwh'] for r in rs):,.0f}, shortfall {sum(r['shortfall_kwh'] for r in rs):,.0f}, "
+                  f"penalty paid ${sum(r['penalty_usd'] for r in rs):,.0f}")
+
+        # --- audit ------------------------------------------------------------------
+        nameplates = ", ".join(f"{a} {meta.loc[a].bess_power_kw:.0f} kW" for a in (HONEST, LIAR))
+        task = (f"You are {AUDITOR}, token {token_of(AUDITOR)}. Public registry, battery nameplate power: "
+                f"{nameplates}. Read the ledger. For each seller, compare declared_flex_kw in its register "
+                f"entry with its nameplate. Challenge each commitment of any seller whose declared envelope "
+                f"exceeds its nameplate (claim 'envelope exceeds nameplate', evidence with both numbers). "
+                f"Do not challenge the others.")
+        _, cost = run("auditor", "auditor.md", task); total_cost += cost
+
+        # --- P&L ----------------------------------------------------------------------
+        print("\n----- P&L -----")
+        print(f"  {'agent':8s} {'role':8s} {'balance $':>10s} {'stake left $':>13s} {'reputation':>11s} {'cap kWh/step':>13s}")
+        for a in q("SELECT * FROM agents ORDER BY role, agent_id"):
+            print(f"  {a['agent_id']:8s} {a['role']:8s} {a['balance_usd']:>10,.0f} {a['stake_locked_usd']:>13,.0f} "
+                  f"{a['reputation']:>11.1f} {a['trade_cap_kwh']:>13,.0f}")
+        s = q("SELECT SUM(committed_kwh) k, SUM(energy_usd + grid_usd - penalty_usd) paid FROM settlements")[0]
+        grid_only = sum(r["committed_kwh"] / 1000 * (float(day[day.step == r["step"]].price_usd_mwh.iloc[0]) + GRID_FEE_USD_MWH)
+                        for r in q("SELECT committed_kwh, step FROM settlements"))
+        print(f"\n  Buyer paid ${s['paid']:,.0f} for {s['k']:,.0f} kWh; grid-only would have cost ${grid_only:,.0f} "
+              f"(saved ${grid_only - s['paid']:,.0f}).")
+        for ch in q("SELECT * FROM challenges"):
+            print(f"  Challenge on #{ch['commitment_id']} by {ch['auditor']}: {ch['verdict']}, bounty ${ch['bounty_usd']:.0f}")
+        print(f"\nLLM cost: ${total_cost:.3f}")
     finally:
         proc.terminate()
 
