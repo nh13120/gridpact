@@ -76,9 +76,11 @@ def adjudicate(conn, commitment, auditor, claim, evidence):
     if valid:
         bounty = min(BOUNTY_SHARE * commitment["stake_usd"], seller["stake_locked_usd"])
         real_cap = math.floor(seller["bess_power_kw"] * STEP_H)
-        conn.execute("UPDATE agents SET stake_locked_usd = stake_locked_usd - ?, "
+        # The bounty leaves the seller's locked stake AND its balance (like a settlement penalty does),
+        # so the auditor's gain below is matched by the seller's loss and money is conserved.
+        conn.execute("UPDATE agents SET stake_locked_usd = stake_locked_usd - ?, balance_usd = balance_usd - ?, "
                      "reputation = MAX(0, reputation - ?), trade_cap_kwh = MIN(trade_cap_kwh, ?) WHERE agent_id = ?",
-                     (bounty, REPUTATION_CUT, real_cap, seller["agent_id"]))
+                     (bounty, bounty, REPUTATION_CUT, real_cap, seller["agent_id"]))
         conn.execute("UPDATE agents SET balance_usd = balance_usd + ? WHERE agent_id = ?", (bounty, auditor))
         conn.execute("UPDATE commitments SET status = 'challenged' WHERE commitment_id = ?",
                      (commitment["commitment_id"],))
