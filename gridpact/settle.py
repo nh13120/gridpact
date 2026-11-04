@@ -87,6 +87,7 @@ def adjudicate(conn, commitment, auditor, claim, evidence):
         conn.execute("UPDATE agents SET balance_usd = balance_usd + ? WHERE agent_id = ?", (bounty, auditor))
         conn.execute("UPDATE commitments SET status = 'challenged' WHERE commitment_id = ?",
                      (commitment["commitment_id"],))
+        trim_to_real_cap(conn, seller["agent_id"], real_cap)
     else:
         conn.execute("UPDATE agents SET balance_usd = balance_usd - ? WHERE agent_id = ?",
                      (CHALLENGE_BOND_USD, auditor))
@@ -99,3 +100,31 @@ def adjudicate(conn, commitment, auditor, claim, evidence):
                "bond_usd": 0 if valid else CHALLENGE_BOND_USD}
     seq = ledger.append(conn, auditor, "challenge", payload)["seq"]
     return {**payload, "ledger_seq": seq}
+
+
+def trim_to_real_cap(conn, seller_id, real_cap):
+    """v2 (benchmark Phase 4): after a valid challenge, cut the seller's not-yet-settled commitments, in
+    commitment order, so their kWh/step fits the real cap. The cut volume is released back to the market
+    (the buyer can re-source it) and the stake locked on it is released. Settled commitments stand."""
+    room = {}                                                   # step -> kWh/step still allowed
+    rows = conn.execute("SELECT * FROM commitments WHERE seller = ? AND status IN ('active', 'challenged') "
+                        "ORDER BY commitment_id", (seller_id,)).fetchall()
+    for c in rows:
+        steps = range(c["step_from"], c["step_to"] + 1)
+        allowed = min(room.setdefault(s, real_cap) for s in steps)
+        new_kwh = min(c["kwh_per_step"], allowed)
+        for s in steps:
+            room[s] -= new_kwh
+        settled = conn.execute("SELECT 1 FROM settlements WHERE commitment_id = ?", (c["commitment_id"],)).fetchone()
+        if new_kwh >= c["kwh_per_step"] or settled:
+            continue
+        n_steps = len(steps)
+        new_stake = c["penalty_usd_mwh"] * new_kwh * n_steps / 1000
+        released = c["stake_usd"] - new_stake
+        conn.execute("UPDATE commitments SET kwh_per_step = ?, stake_usd = ?, trimmed_from_kwh = ? WHERE commitment_id = ?",
+                     (new_kwh, new_stake, c["kwh_per_step"], c["commitment_id"]))
+        conn.execute("UPDATE agents SET stake_locked_usd = MAX(0, stake_locked_usd - ?) WHERE agent_id = ?",
+                     (released, seller_id))
+        ledger.append(conn, "gridpact", "trim", {"commitment_id": c["commitment_id"], "seller": seller_id,
+                                                 "buyer": c["buyer"], "from_kwh": c["kwh_per_step"], "to_kwh": new_kwh,
+                                                 "released_stake_usd": round(released, 2)})

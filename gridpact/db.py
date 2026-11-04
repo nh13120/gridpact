@@ -46,7 +46,8 @@ CREATE TABLE IF NOT EXISTS commitments (
     price_usd_mwh   REAL NOT NULL,
     penalty_usd_mwh REAL NOT NULL,
     stake_usd       REAL NOT NULL,            -- penalty x total kWh, locked from the seller
-    status          TEXT NOT NULL DEFAULT 'active' -- active | challenged
+    status          TEXT NOT NULL DEFAULT 'active', -- active | challenged
+    trimmed_from_kwh REAL                     -- v2: kWh/step before a valid challenge cut it to the real cap
 );
 CREATE TABLE IF NOT EXISTS settlements (
     id              INTEGER PRIMARY KEY,

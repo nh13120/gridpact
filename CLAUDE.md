@@ -13,8 +13,14 @@ deterministic settlement and an independent verifier. Spec in `PLAN.md`, status 
 - `python -m gridpact.server` — just the MCP server at http://127.0.0.1:8765/mcp
 
 ## Test
-- `pytest` — ledger hash-chain tests
+- `pytest` — ledger, settlement, adjudication and trim tests
 - `python -m tests.smoke_client` — one trade over MCP without an LLM
+
+## Benchmark (HW7, `benchmark/`)
+- Spec: `benchmark/PREREGISTRATION.md` (fixed before runs; amendments dated). Results: `benchmark/README.md`.
+- `python -m benchmark.run --condition both --scenario <id|tuning|heldout|stress|all> --seeds 5 --parallel 4 --version vN` (~$0.005/run, resumable, stops at the $15 cap)
+- `python -m benchmark.score --version vN && python -m benchmark.analyze --version vN && python -m benchmark.stress --version vN && python -m benchmark.compare`
+- Keep `benchmark/runs/` in git (logs); `*.db`, `server.log`, `stdout.log` inside it stay ignored.
 
 ## Rules
 - Truth columns (`anomaly_flag`, `*_true_*`) are read only in `verify.py`.

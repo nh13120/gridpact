@@ -106,6 +106,23 @@ def test_challenging_an_honest_seller_costs_the_auditor_a_bond(tmp_path):
     assert after["LIAR"] == before["LIAR"]
 
 
+def test_valid_challenge_before_settlement_trims_commitment_to_real_cap(tmp_path):
+    """v2: challenged BEFORE settlement -> the commitment is cut to the real cap, the stake on the cut part is
+    released, and settlement then has no shortfall. (Challenged after settlement -> nothing is trimmed.)"""
+    conn = world(tmp_path)
+    c = conn.execute("SELECT * FROM commitments").fetchone()
+    settle.adjudicate(conn, c, "AUD", "x", "y")
+    conn.commit()
+    c2 = conn.execute("SELECT * FROM commitments").fetchone()
+    assert c2["kwh_per_step"] == 608 and c2["trimmed_from_kwh"] == KWH
+    assert c2["stake_usd"] == pytest.approx(PENALTY * 608 * 12 / 1000)
+    liar = conn.execute("SELECT stake_locked_usd FROM agents WHERE agent_id = 'LIAR'").fetchone()
+    assert liar["stake_locked_usd"] == pytest.approx(c2["stake_usd"] - 0.10 * PENALTY * KWH * 12 / 1000, abs=0.01)
+    rows = settle.settle_day(conn, make_day())
+    assert sum(r["shortfall_kwh"] for r in rows) == 0
+    assert conn.execute("SELECT COUNT(*) FROM ledger WHERE action = 'trim'").fetchone()[0] == 1
+
+
 def test_ledger_chain_is_intact_after_settlement_and_challenge(tmp_path):
     conn = world(tmp_path)
     settle.settle_day(conn, make_day())

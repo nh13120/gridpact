@@ -192,10 +192,19 @@ Then ONE change, motivated by the trace evidence, retested on tuning and then he
 ## 10. Reproduce
 
 ```
-python -m benchmark.run --condition gridpact --scenario all --seeds 5
-python -m benchmark.run --condition baseline --scenario all --seeds 5
-python -m benchmark.score            # raw JSONL + per-run DBs -> benchmark/results/results_v1.csv
-python -m benchmark.analyze          # every table and chart from the CSV
+# v1 (git tag v1): both conditions, 15 scenarios + 4 stress levels, 5 seeds (190 runs, ~$1)
+python -m benchmark.run --condition both --scenario all --seeds 5 --parallel 4 --version v1
+python -m benchmark.score --version v1      # run logs -> benchmark/results/results_v1.csv
+python -m benchmark.analyze --version v1    # tables + preregistered checks -> summary_v1.md
+python -m benchmark.stress --version v1     # stress sweep table + plot -> stress_v1.md / .png
+
+# v2 (git tag v2): gridpact only, the scenarios a challenge can touch, same seeds (85 runs)
+python -m benchmark.run --condition gridpact --version v2 --seeds 5 --parallel 4 \
+  --scenario liar2x_of_2,liar2x_of_4,subtle115_of_4,subtle108_of_4,double_sell,dropout_of_4,lazy_auditor,stress,heldout
+python -m benchmark.score --version v2
+python -m benchmark.analyze --version v2    # baseline rows and untouched scenarios come from v1
+python -m benchmark.stress --version v2
+python -m benchmark.compare                 # before/after, tuning and held-out separately -> compare_v1_v2.md
 ```
 
 Logs: `benchmark/runs/<run_id>.jsonl` (run id, condition, scenario, seed, model, every tool call and

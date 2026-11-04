@@ -10,6 +10,10 @@ earns a bounty while the liar loses reputation and trading cap. Every action is 
 (buyer, honest seller, lying seller, auditor) calling GridPact through MCP, deterministic settlement,
 and an independent verifier. Status: all six phases done (`docs/PROGRESS.md`).
 
+**HW7 benchmark**: `benchmark/` holds the preregistered evaluation (claim, ablation baseline, 15 scenarios,
+stress sweep, one evidence-driven change, retest on held-out cases) with every run log. Start with
+`benchmark/README.md`; git tags `v1` and `v2` mark the system before and after the change.
+
 ## Setup (fresh clone)
 
 ```bash

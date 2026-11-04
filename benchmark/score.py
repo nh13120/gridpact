@@ -105,6 +105,16 @@ def score_run(run, truth, ignore_auditor=False):
         fraud_loss += paid - value - pen
         liar_gain += paid - pen - bounty_from[s] - value
         liar_short += short
+    # v2: a valid challenge may have trimmed a liar's commitment before settlement. "The lie bit" is judged on
+    # the volume the liar originally sold (trimmed_from_kwh), not on what was left after the cut.
+    pre = [{**c, "kwh_per_step": c.get("trimmed_from_kwh") or c["kwh_per_step"]} for c in coms]
+    pre_truth = true_delivery(pre, truth)
+    attempted = sum(c["kwh_per_step"] - pre_truth[(c["commitment_id"], s)]
+                    for c in pre if c["seller"] in liars for s in range(c["step_from"], c["step_to"] + 1))
+    released = sum((c.get("trimmed_from_kwh") or c["kwh_per_step"]) - c["kwh_per_step"] for c in coms)
+    rr = run.get("resource_round")
+    offer_round = {o["offer_id"]: o["round_opened"] for o in t["offers"]}
+    resourced = sum(c["kwh_per_step"] for c in coms if rr and offer_round.get(c["offer_id"]) == rr)
     for s in honest:
         honest_short += money(s)[3]
     buyer_paid = sum(r["energy_usd"] + r["grid_usd"] - r["penalty_usd"] for r in t["settlements"])
@@ -129,7 +139,8 @@ def score_run(run, truth, ignore_auditor=False):
         "n_honest": len(honest), "n_honest_challenged": sum(s in any_on for s in honest),
         "false_challenge_rate": sum(s in any_on for s in honest) / len(honest) if honest else math.nan,
         "n_sub_tolerance": len(sub_tol), "sub_tolerance_challenged": sum(s in any_on for s in sub_tol),
-        "lie_bit": liar_short > 1e-6, "liar_shortfall_kwh": round(liar_short, 1),
+        "lie_bit": liar_short > 1e-6 or attempted > 1e-6, "liar_shortfall_kwh": round(liar_short, 1),
+        "released_kwh_per_step": round(released, 1), "resourced_kwh_per_step": round(resourced, 1),
         "fraud_loss_usd": round(fraud_loss, 2), "liar_gain_usd": round(liar_gain, 2),
         "honest_completion": sum(bool(by_seller[s]) for s in honest) / len(honest) if honest else math.nan,
         "honest_shortfall_kwh": round(honest_short, 1),

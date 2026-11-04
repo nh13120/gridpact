@@ -15,7 +15,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from benchmark.analyze import table
+from benchmark.analyze import load, table
 
 HERE = Path(__file__).resolve().parent
 LEVELS = {"liar2x_of_2": 2, "liar2x_of_4": 4, "stress_n6": 6, "stress_n8": 8, "stress_n12": 12, "stress_n16": 16}
@@ -28,7 +28,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--version", default="v1")
     args = ap.parse_args()
-    df = pd.read_csv(HERE / "results" / f"results_{args.version}.csv")
+    df = load(args.version)
     df = df[df.scenario.isin(LEVELS) & df.condition.isin(["gridpact", "baseline"])].copy()
     df["n"] = df.scenario.map(LEVELS)
     df["coverage"] = df.true_delivered_kwh / 12 / df.need_kwh_per_step      # share of the buyer's need really delivered

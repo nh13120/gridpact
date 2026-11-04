@@ -68,11 +68,26 @@ def checks(df):
     return lines, integrity, len(lie_no_bite)
 
 
+def load(version):
+    """Scored rows for a version. v2 reran only the gridpact condition (the change does not exist in the
+    baseline) and only the scenarios a challenge can touch; the baseline rows and the untouched honest
+    scenarios are taken from v1, same seeds, and marked in the `source` column."""
+    df = pd.read_csv(HERE / "results" / f"results_{version}.csv")
+    df["source"] = version
+    if version != "v1":
+        v1 = pd.read_csv(HERE / "results" / "results_v1.csv")
+        v1["source"] = "v1"
+        missing = ~v1.set_index(["condition", "scenario", "seed"]).index.isin(
+            df.set_index(["condition", "scenario", "seed"]).index)
+        df = pd.concat([df, v1[missing]], ignore_index=True)
+    return df
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--version", default="v1")
     args = ap.parse_args()
-    df = pd.read_csv(HERE / "results" / f"results_{args.version}.csv")
+    df = load(args.version)
     df = df[df.set != "stress"]          # the stress sweep has its own report: benchmark/stress.py
     md = [f"# Results {args.version}", "", f"{df[df.condition != 'stake_only'].shape[0]} real runs "
           f"({df[df.condition == 'gridpact'].shape[0]} gridpact, {df[df.condition == 'baseline'].shape[0]} baseline); "

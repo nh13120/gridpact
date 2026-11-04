@@ -117,6 +117,39 @@ def run_one(sc, condition, seed, rundir):
                     f"Do not challenge the others.{sc['auditor']['extra']}")
             run_agent.run("AUD_01", "auditor.md", task, max_turns=sc["auditor"]["max_turns"])
 
+        # --- v2: re-source the volume a valid challenge released (one extra round) ---------------
+        resource_round = None
+        trimmed = q("SELECT c.*, o.round_opened FROM commitments c JOIN offers o USING (offer_id) "
+                    "WHERE trimmed_from_kwh IS NOT NULL")
+        if trimmed:
+            resource_round = rnd + 1
+            server.set_round(resource_round)
+            for b in buyers:
+                mine = [c for c in trimmed if c["buyer"] == b]
+                if not mine:
+                    continue
+                gap = sum(c["trimmed_from_kwh"] - c["kwh_per_step"] for c in mine)
+                cuts = "; ".join(f"commitment #{c['commitment_id']} with {c['seller']} was cut from "
+                                 f"{c['trimmed_from_kwh']:.0f} to {c['kwh_per_step']:.0f} kWh/step" for c in mine)
+                task = (f"You are {b}, token {token(b)}. Round {resource_round}. An auditor's challenge was upheld: {cuts}. "
+                        f"You still need about {gap:.0f} kWh per step more. Find counterparties and propose the "
+                        f"missing volume to sellers you have no commitment with yet, each at the smaller of its trade "
+                        f"cap and what you still need. {facts}")
+                run_agent.run(b, "buyer.md", task)
+            for s, factor in sellers.items():
+                if s in dropouts or not open_to(s):
+                    continue
+                m = meta.loc[s]
+                role_file, envelope = ("honest_seller.md", f"Your declared envelope is {m.flex_up_kw:.0f} kW, which is your true battery power.") \
+                    if factor == 1.0 else ("liar.md", f"Your registered trade cap is {math.floor(factor * m.flex_up_kw * STEP_H)} kWh per step.")
+                task = (f"You are {s}, token {token(s)}. Round {resource_round}. {envelope} Check your inbox and answer "
+                        f"every open offer. Your minimum price is {da:.0f} $/MWh (wholesale). {facts}")
+                run_agent.run(s, role_file, task)
+            for b in buyers:                                     # accept any counters
+                if open_to(b):
+                    run_agent.run(b, "buyer.md", f"You are {b}, token {token(b)}. Round {resource_round}. Check your inbox: "
+                                                 f"accept counters at or below the grid price, otherwise counter. {facts}")
+
         # --- settlement: metered (gridpact) or trust (baseline) ----------------------------------
         c = db.connect()
         settle.settle_day(c, day, trust=(condition == "baseline"))
@@ -141,7 +174,7 @@ def run_one(sc, condition, seed, rundir):
         "buyers": buyers, "dropouts": sorted(dropouts), "need_kwh_per_step": need,
         "price_da": da, "price_grid": grid, "rt_price_by_step": {int(s): float(p) for s, p in
                                                                  day.groupby("step").price_usd_mwh.first().items()},
-        "wall_s": round(time.time() - t0, 1), "rounds": rnd,
+        "wall_s": round(time.time() - t0, 1), "rounds": rnd, "resource_round": resource_round,
         "llm_turns": len(results), "error_turns": sum(t["subtype"] != "success" for t in results),
         "api_turns": sum(t.get("num_turns") or 0 for t in results),
         "turn_ms": [t.get("duration_ms") for t in results],
@@ -181,7 +214,8 @@ def main():
               f"challenges={len(out['tables']['challenges'])} wall={out['wall_s']}s")
         return
 
-    wanted = [s for s in scs.values() if args.scenario in ("all", s["set"], s["id"])]
+    sel = args.scenario.split(",")                       # ids, sets ('tuning', 'heldout', 'stress') or 'all'
+    wanted = [s for s in scs.values() if "all" in sel or s["set"] in sel or s["id"] in sel]
     conds = ["gridpact", "baseline"] if args.condition == "both" else [args.condition]
     jobs = [(s["id"], c, k) for s in wanted for c in conds for k in range(1, args.seeds + 1)]
     jobs = [j for j in jobs if not (RUNS / args.version / f"{j[1]}__{j[0]}__s{j[2]}" / "run.json").exists()]

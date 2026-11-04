@@ -15,7 +15,7 @@ Check the phase's "done when" command before ticking it. Details in `PLAN.md`.
 - [x] B1 - preregistration committed before any run (`preregistration` commit)
 - [x] B2 - harness + 150 runs (15 scenarios x 2 conditions x 5 seeds): `python -m benchmark.score && python -m benchmark.analyze` -> `results/results_v1.csv`, `summary_v1.md`. P1-P6 all pass.
 - [x] B3 - stress sweep 2 -> 16 sellers (40 more runs): `python -m benchmark.stress` -> `results/stress_v1.md`, `stress_v1.png`. Limit found at n >= 6 (crowding out); change decided (see PREREGISTRATION "Phase 3 decision").
-- [ ] B4 - v2 change (challenge trims the commitment, released volume re-sourced), rerun gridpact on tuning then held-out: `results_v2.csv`, `summary_v2.md`, before/after table.
+- [x] B4 - v2 change (challenge trims the commitment, released volume re-sourced), 85 gridpact reruns on tuning then held-out: `python -m benchmark.compare` -> `results/compare_v1_v2.md`; `results_v2.csv`, `summary_v2.md`, `stress_v2.md`. Write-up in `benchmark/README.md`. Git tags `v1` (before) and `v2` (after).
 
 ## What's next
-B4, then the write-up. December work after that (see README "Next steps").
+Read `benchmark/README.md`. Open question for the next iteration: a second audit after re-sourcing (recall fell at 12-16 sellers in v2). December work after that (see README "Next steps").
