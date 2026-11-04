@@ -127,6 +127,13 @@ Commands and the exact scenario lists are in `PREREGISTRATION.md` section 10. Ev
 in `results/` is regenerated from `runs/` by `score.py`, `analyze.py`, `stress.py` and `compare.py`.
 Total API spend for everything here was about $1.60 against a $15 cap.
 
+## Report and contributions
+
+The submitted PDF is `HW7_report.pdf` (written by Maheen from the files in this folder). Contributions:
+Nicolas wrote the preregistration, harness, scorer, ran the 190 v1 and 85 v2 runs and made the v2 change;
+Maheen wrote the report and, earlier, fixed the bounty accounting and added the money-conservation check and
+settlement tests (`tests/test_settle.py`) that the deterministic settlement here relies on.
+
 ## Files
 
 | path | what |

@@ -278,3 +278,8 @@ rise at n >= 6, the change failed. Scoring under v2 uses the pre-trim volume
    simulator's truth (the HW6 cap ignores duration), not a lie; it is reported as
    `honest_shortfall_kwh` and cannot cause a challenge, since the auditor compares declared power
    with nameplate power only.
+
+8. **Housekeeping note (2026-11-04, after all results; nothing above changed).** The amendments above
+   appear in the order 5, 6, 7, 1, 2, 3, 4 because 5-7 were added during Phase 2 and 1-4 earlier in the
+   file; the numbers are kept so references to them stay valid. The $15 cap in section 8 was used as
+   proposed; actual spend was about $1.60. Written by Maheen; Nicolas has not yet confirmed the cap line.

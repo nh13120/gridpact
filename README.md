@@ -12,7 +12,7 @@ and an independent verifier. Status: all six phases done (`docs/PROGRESS.md`).
 
 **HW7 benchmark**: `benchmark/` holds the preregistered evaluation (claim, ablation baseline, 15 scenarios,
 stress sweep, one evidence-driven change, retest on held-out cases) with every run log. Start with
-`benchmark/README.md`.
+`benchmark/README.md`; the submitted report is `benchmark/HW7_report.pdf`.
 
 Git tags tell the two homeworks apart: `hw6` is the HW6 system as handed in (everything outside
 `benchmark/`); `v1` is HW7 before its one change to the system; `v2` is after it. `git diff hw6 v1`
@@ -124,4 +124,6 @@ spreads; metrics from the proposal (energy kept local, fraudulent kWh settled, t
 
 ## Team
 
-Nicolas (protocol, ledger, MCP, agents) and Maheen. HW6 for MAS.665 AI Studio, fall 2026.
+Nicolas (protocol, ledger, MCP, agents; for HW7 the preregistration, benchmark harness, runs and the v2 change) and Maheen
+(HW6 audit fixes: bounty accounting, money-conservation check, settlement tests; HW7 write-up and report).
+MAS.665 AI Studio, fall 2026.
