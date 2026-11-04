@@ -8,3 +8,7 @@ data/*
 .pytest_cache/
 .DS_Store
 server.log
+
+# benchmark: keep the run logs, drop the per-run DBs and server logs (covered by *.db / server.log above)
+!benchmark/runs/
+benchmark/runs/**/stdout.log

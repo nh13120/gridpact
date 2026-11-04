@@ -24,8 +24,11 @@ REPUTATION_CUT = 0.5
 CHALLENGE_BOND_USD = 50.0
 
 
-def settle_day(conn, day):
-    """Settle every active commitment against `day` (output of data.load_day). Returns rows written."""
+def settle_day(conn, day, trust=False):
+    """Settle every active commitment against `day` (output of data.load_day). Returns rows written.
+
+    trust=True is the benchmark's baseline: pay the seller for what it committed, as if every claim
+    were true. No shortfall, no penalty, no grid top-up. The scorer computes the real shortfall."""
     price_rt = day.groupby("step").price_usd_mwh.first()
     written = []
     power_left, energy_left = {}, {}   # per (seller, step) kWh and per seller kWh, shared by all its commitments
@@ -38,7 +41,7 @@ def settle_day(conn, day):
         for step in range(c["step_from"], c["step_to"] + 1):
             power_left.setdefault((sid, step), seller["bess_power_kw"] * STEP_H)  # kWh in this step
             committed = c["kwh_per_step"]
-            delivered = min(committed, power_left[(sid, step)], energy_left[sid])
+            delivered = committed if trust else min(committed, power_left[(sid, step)], energy_left[sid])
             power_left[(sid, step)] -= delivered
             energy_left[sid] -= delivered
             shortfall = committed - delivered

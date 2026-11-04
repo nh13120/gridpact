@@ -10,5 +10,12 @@ Check the phase's "done when" command before ticking it. Details in `PLAN.md`.
 - [x] Phase 5 - independent `verify.py` + `python orchestrate.py --demo` (6/6 checks)
 - [x] Phase 6 - README complete, code review fixes, fresh-clone test; GitHub repo pending approval
 
+## Benchmark (HW7): `benchmark/PREREGISTRATION.md` is the spec, `benchmark/results/` the output
+
+- [x] B1 - preregistration committed before any run (`preregistration` commit)
+- [x] B2 - harness + 150 runs (15 scenarios x 2 conditions x 5 seeds): `python -m benchmark.score && python -m benchmark.analyze` -> `results/results_v1.csv`, `summary_v1.md`. P1-P6 all pass.
+- [x] B3 - stress sweep 2 -> 16 sellers (40 more runs): `python -m benchmark.stress` -> `results/stress_v1.md`, `stress_v1.png`. Limit found at n >= 6 (crowding out); change decided (see PREREGISTRATION "Phase 3 decision").
+- [ ] B4 - v2 change (challenge trims the commitment, released volume re-sourced), rerun gridpact on tuning then held-out: `results_v2.csv`, `summary_v2.md`, before/after table.
+
 ## What's next
-Hand-off: Nicolas creates the private GitHub repo and adds Maheen. Then December work (see README "Next steps").
+B4, then the write-up. December work after that (see README "Next steps").

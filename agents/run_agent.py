@@ -45,8 +45,9 @@ async def run_turn(name, role_file, task, max_turns=8):
     )
     print(f"\n=== {name} ===")
     log({"agent": name, "event": "task", "text": task})
-    final, cost = "", 0.0
-    async for msg in query(prompt=task, options=options):
+    final, cost, seen_result = "", 0.0, False
+    try:
+      async for msg in query(prompt=task, options=options):
         if isinstance(msg, AssistantMessage):
             for b in msg.content:
                 if isinstance(b, ToolUseBlock):
@@ -64,8 +65,15 @@ async def run_turn(name, role_file, task, max_turns=8):
                     print(f"     <- {_short(text.replace(chr(10), ' '), 120)}")
                     log({"agent": name, "event": "tool_result", "text": text})
         elif isinstance(msg, ResultMessage):
-            cost = msg.total_cost_usd or 0.0
-            log({"agent": name, "event": "result", "subtype": msg.subtype, "cost_usd": cost, "text": final})
+            cost, seen_result = msg.total_cost_usd or 0.0, True
+            log({"agent": name, "event": "result", "subtype": msg.subtype, "cost_usd": cost, "text": final,
+                 "usage": msg.usage, "duration_ms": msg.duration_ms, "num_turns": msg.num_turns})
+    except Exception as e:
+        # When the turn hits max_turns the CLI exits non-zero and the SDK raises AFTER it already
+        # delivered the ResultMessage. The turn is over either way; only re-raise if we never got a result.
+        if not seen_result:
+            raise
+        log({"agent": name, "event": "stderr", "text": f"turn ended with {type(e).__name__}: {e}"})
     print(f"  {name}: {final}  (${cost:.3f})")
     return final, cost
 

@@ -203,6 +203,69 @@ result, commitments, challenges, settlement, ground truth, tokens, wall time, $,
 run's SQLite file. No API keys, no ENGIE time series in the logs; only the per-step numbers the
 scorer needs.
 
+## Phase 3 decision (written after the v1 stress sweep, before any v2 run)
+
+**Where GridPact stops helping.** Recall is 1.0 at every n (H2 never bites), no buyer or auditor
+ever hit its turn cap (H1), and the ledger stays under one page except at n = 16, where the
+auditor still caught everything (H3). The failure is H4. From n = 6 the sellers' declared caps
+exceed the buyer's need, so the buyer fills its 5,942 kWh/step on paper from the nearest four
+sellers, two of which have doubled caps, and never offers to the rest. Real delivery is 46,645 kWh
+= 65% of need at n = 6, 8, 12 and 16, **the same in both conditions**; honest completion falls
+1.0 → 0.5 → 0.22. GridPact catches both liars before settlement and refunds the buyer
+(fraud loss −$1,552 vs +$1,012 baseline), but the energy outcome is identical to the baseline:
+the challenged commitments stand in full, the phantom half delivers nothing, and the honest
+capacity further down the list sits idle. Run ids: `gridpact__stress_n12__s1` (buyer: "the first
+four sellers' caps fill it, so I did not offer to the other eight"), `gridpact__stress_n6__s1..s5`
+(4 sellers offered, coverage 0.654 in all five), `gridpact__double_sell_h__s1..s5` (both buyers
+skip the honest PVB_16 because the liar's doubled cap "already covers the full need").
+
+**The one change (v2): a valid challenge trims the liar's commitments to its real cap and the
+released volume goes back to market.** In `settle.adjudicate`, the valid branch already resets the
+seller's trade cap to the real one; v2 also cuts that seller's active commitments, in commitment
+order, so their total kWh/step fits the real cap, records the old volume in a new
+`trimmed_from_kwh` column and a `trim` ledger entry, and releases the stake locked on the trimmed
+part. The runner then gives buyers whose commitments were trimmed one more negotiation round
+(same prompts; the task names the trimmed commitment and the released kWh/step) and the sellers
+their answers. Nothing changes for the baseline, which has no challenges, so baseline v1 is the
+comparison; only the gridpact condition is rerun, same scenarios, seeds, model and limits.
+
+**Expected, stated in advance.** At n >= 6, gridpact coverage rises above 0.65 and honest
+completion above the baseline's; fraud loss stays <= 0; liar gain stays < 0 through the bounty
+(penalties fall to ~0 because a trimmed commitment has no shortfall); P1 and P2 unchanged; cost
+per run up roughly one buyer round. Held-out: `double_sell_h` should improve (the honest seller
+was idle in 5/5 runs); the other held-out cases have little room to move. If coverage does not
+rise at n >= 6, the change failed. Scoring under v2 uses the pre-trim volume
+(`trimmed_from_kwh`) for `lie_bit` and the liars' attempted fraud, so P3/P4 keep their meaning.
+
 ## Amendments
 
-(none yet)
+5. **Harness fix (Phase 2, before results were read).** With `max_turns=2` the auditor finished its
+   work (parallel tool calls) and the SDK then raised after already delivering the result, killing
+   the run. `run_agent.py` now logs that exception and keeps the turn when a result was received.
+   The five `gridpact lazy_auditor` runs were rerun with the same seeds.
+6. **Dropout check relaxed to its stated intent** ("no stake stuck"): no commitment, no stake, and
+   at least one offer to the silent seller expired. In 1 of 5 runs the buyer re-sent an offer in the
+   last round that was still open at the end; it ties nothing up.
+7. **Scorer reads the tool-call log** (`transcript.jsonl` events, not agent prose) for the stress
+   hypothesis columns: offers per seller, ledger length, the auditor's `get_ledger` limit, turn caps hit.
+
+1. **Denominators made precise (2026-11-03, while writing the scorer, before the batch ran).**
+   P1 recall counts dishonest sellers *that hold at least one commitment* (a liar nobody traded with
+   has nothing to challenge). P3 and P4 are evaluated over runs where *the lie bit*: a liar's
+   commitments exceed what its battery can really deliver. A liar whose commitments fit inside its
+   real capacity was not caught by anything and gains nothing by lying; those runs are counted and
+   reported, not graded. One smoke run per condition (`benchmark/runs/smoke/`, scenario
+   `liar2x_of_2`) was used to check the arithmetic of the scorer; its numbers match the hand
+   calculation in section 1 and are not part of the results.
+2. **Two more minimal hooks** beyond section 9: `server.register_agent` now accepts any entity in
+   the ENGIE registry (it was hard-coded to the three HW6 agents), and `server.launch` takes the
+   server log path from `GRIDPACT_SERVER_LOG` so parallel runs don't overwrite each other's log.
+3. **Run layout**: one folder per run (`benchmark/runs/<version>/<condition>__<scenario>__s<seed>/`)
+   holding `transcript.jsonl` (every agent event) and `run.json` (metadata, ground truth, all DB
+   tables), instead of a single JSONL file. The SQLite file stays local (ignored by git).
+4. **Observation, not a change**: several honest sellers hold less than 3 h of energy at nameplate
+   (e.g. PVB_32 2.3 h, PVB_50 2.2 h), so an honest seller that commits its full cap for the 12-step
+   window is shorted by the energy bound late in the window and pays penalties. That is the
+   simulator's truth (the HW6 cap ignores duration), not a lie; it is reported as
+   `honest_shortfall_kwh` and cannot cause a challenge, since the auditor compares declared power
+   with nameplate power only.

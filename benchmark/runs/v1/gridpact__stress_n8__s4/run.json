@@ -1,0 +1,1285 @@
+{
+ "run_id": "gridpact__stress_n8__s4",
+ "version": "v1",
+ "condition": "gridpact",
+ "scenario": "stress_n8",
+ "set": "stress",
+ "type": "stress",
+ "seed": 4,
+ "model": "claude-haiku-5-5",
+ "day": "2023-06-19",
+ "window": [
+  68,
+  79
+ ],
+ "max_turns": 8,
+ "auditor_max_turns": 8,
+ "ground_truth": {
+  "PVB_17": {
+   "factor": 1.0,
+   "true_power_kw": 5454.6454993087,
+   "true_energy_kwh": 17595.784592289354
+  },
+  "PVB_37": {
+   "factor": 2.0,
+   "true_power_kw": 2434.6590454337666,
+   "true_energy_kwh": 8377.912210331759
+  },
+  "PVB_32": {
+   "factor": 1.0,
+   "true_power_kw": 3274.8364294742855,
+   "true_energy_kwh": 7655.1420333543
+  },
+  "PVB_50": {
+   "factor": 2.0,
+   "true_power_kw": 6837.389421813063,
+   "true_energy_kwh": 15330.171462986018
+  },
+  "PVB_01": {
+   "factor": 1.0,
+   "true_power_kw": 4295.844443192616,
+   "true_energy_kwh": 15236.415406427706
+  },
+  "PVB_15": {
+   "factor": 1.0,
+   "true_power_kw": 2841.5427809671323,
+   "true_energy_kwh": 7672.4960790707255
+  },
+  "PVB_11": {
+   "factor": 1.0,
+   "true_power_kw": 1643.433900752211,
+   "true_energy_kwh": 3315.9585131697436
+  },
+  "PVB_36": {
+   "factor": 1.0,
+   "true_power_kw": 7045.629784328691,
+   "true_energy_kwh": 14621.180430743387
+  }
+ },
+ "buyers": [
+  "COM_09"
+ ],
+ "dropouts": [],
+ "need_kwh_per_step": {
+  "COM_09": 5941.53466796875
+ },
+ "price_da": 39.03666687011719,
+ "price_grid": 69.03666687011719,
+ "rt_price_by_step": {
+  "0": 18.3799991607666,
+  "1": 18.3799991607666,
+  "2": 18.3799991607666,
+  "3": 18.3799991607666,
+  "4": 16.799999237060547,
+  "5": 16.799999237060547,
+  "6": 16.799999237060547,
+  "7": 16.799999237060547,
+  "8": 15.979999542236328,
+  "9": 15.979999542236328,
+  "10": 15.979999542236328,
+  "11": 15.979999542236328,
+  "12": 15.779999732971191,
+  "13": 15.779999732971191,
+  "14": 15.779999732971191,
+  "15": 15.779999732971191,
+  "16": 16.8700008392334,
+  "17": 16.8700008392334,
+  "18": 16.8700008392334,
+  "19": 16.8700008392334,
+  "20": 19.1200008392334,
+  "21": 19.1200008392334,
+  "22": 19.1200008392334,
+  "23": 19.1200008392334,
+  "24": 19.809999465942383,
+  "25": 19.809999465942383,
+  "26": 19.809999465942383,
+  "27": 19.809999465942383,
+  "28": 21.049999237060547,
+  "29": 21.049999237060547,
+  "30": 21.049999237060547,
+  "31": 21.049999237060547,
+  "32": 24.81999969482422,
+  "33": 24.81999969482422,
+  "34": 24.81999969482422,
+  "35": 24.81999969482422,
+  "36": 28.579999923706055,
+  "37": 28.579999923706055,
+  "38": 28.579999923706055,
+  "39": 28.579999923706055,
+  "40": 29.049999237060547,
+  "41": 29.049999237060547,
+  "42": 29.049999237060547,
+  "43": 29.049999237060547,
+  "44": 30.06999969482422,
+  "45": 30.06999969482422,
+  "46": 30.06999969482422,
+  "47": 30.06999969482422,
+  "48": 31.059999465942383,
+  "49": 31.059999465942383,
+  "50": 31.059999465942383,
+  "51": 31.059999465942383,
+  "52": 56.689998626708984,
+  "53": 56.689998626708984,
+  "54": 56.689998626708984,
+  "55": 56.689998626708984,
+  "56": 37.7400016784668,
+  "57": 37.7400016784668,
+  "58": 37.7400016784668,
+  "59": 37.7400016784668,
+  "60": 55.0,
+  "61": 55.0,
+  "62": 55.0,
+  "63": 55.0,
+  "64": 47.97999954223633,
+  "65": 47.97999954223633,
+  "66": 47.97999954223633,
+  "67": 47.97999954223633,
+  "68": 59.15999984741211,
+  "69": 59.15999984741211,
+  "70": 59.15999984741211,
+  "71": 59.15999984741211,
+  "72": 39.5,
+  "73": 39.5,
+  "74": 39.5,
+  "75": 39.5,
+  "76": 30.450000762939453,
+  "77": 30.450000762939453,
+  "78": 30.450000762939453,
+  "79": 30.450000762939453,
+  "80": 28.850000381469727,
+  "81": 28.850000381469727,
+  "82": 28.850000381469727,
+  "83": 28.850000381469727,
+  "84": 25.040000915527344,
+  "85": 25.040000915527344,
+  "86": 25.040000915527344,
+  "87": 25.040000915527344,
+  "88": 21.030000686645508,
+  "89": 21.030000686645508,
+  "90": 21.030000686645508,
+  "91": 21.030000686645508,
+  "92": 16.18000030517578,
+  "93": 16.18000030517578,
+  "94": 16.18000030517578,
+  "95": 16.18000030517578
+ },
+ "wall_s": 32.8,
+ "rounds": 2,
+ "llm_turns": 6,
+ "error_turns": 0,
+ "api_turns": 20,
+ "turn_ms": [
+  7049,
+  4184,
+  2997,
+  4858,
+  2452,
+  4930
+ ],
+ "tokens_in": 67409,
+ "tokens_out": 3901,
+ "cost_usd": 0.00533,
+ "tool_calls": 14,
+ "refusals": 1,
+ "tables": {
+  "agents": [
+   {
+    "agent_id": "COM_09",
+    "role": "buyer",
+    "bus": 147,
+    "bess_power_kw": 4009.747093346474,
+    "bess_energy_kwh": 13809.56381680694,
+    "declared_flex_kw": 8726.955869542988,
+    "flex_duration_h": 6.221999354986961,
+    "reputation": 1.0,
+    "trade_cap_kwh": 2181.0,
+    "balance_usd": -1742.6244024339742,
+    "stake_locked_usd": 0.0
+   },
+   {
+    "agent_id": "PVB_17",
+    "role": "seller",
+    "bus": 6,
+    "bess_power_kw": 5454.6454993087,
+    "bess_energy_kwh": 17595.784592289354,
+    "declared_flex_kw": 5454.6454993087,
+    "flex_duration_h": 3.2258346751442186,
+    "reputation": 1.0,
+    "trade_cap_kwh": 1363.0,
+    "balance_usd": 412.0199999999999,
+    "stake_locked_usd": 631.764
+   },
+   {
+    "agent_id": "PVB_37",
+    "role": "seller",
+    "bus": 140,
+    "bess_power_kw": 2434.6590454337666,
+    "bess_energy_kwh": 8377.912210331759,
+    "declared_flex_kw": 4869.318090867533,
+    "flex_duration_h": 3.4411028624499345,
+    "reputation": 1.0,
+    "trade_cap_kwh": 1217.0,
+    "balance_usd": 0.0,
+    "stake_locked_usd": 0.0
+   },
+   {
+    "agent_id": "PVB_32",
+    "role": "seller",
+    "bus": 197,
+    "bess_power_kw": 3274.8364294742855,
+    "bess_energy_kwh": 7655.1420333543,
+    "declared_flex_kw": 3274.8364294742855,
+    "flex_duration_h": 2.337564699249175,
+    "reputation": 1.0,
+    "trade_cap_kwh": 818.0,
+    "balance_usd": 0.0,
+    "stake_locked_usd": 0.0
+   },
+   {
+    "agent_id": "PVB_50",
+    "role": "seller",
+    "bus": 156,
+    "bess_power_kw": 6837.389421813063,
+    "bess_energy_kwh": 15330.171462986018,
+    "declared_flex_kw": 13674.778843626125,
+    "flex_duration_h": 2.2421088689315773,
+    "reputation": 0.5,
+    "trade_cap_kwh": 1709.0,
+    "balance_usd": -1365.4748532195936,
+    "stake_locked_usd": 774.7714309460348
+   },
+   {
+    "agent_id": "PVB_01",
+    "role": "seller",
+    "bus": 117,
+    "bess_power_kw": 4295.844443192616,
+    "bess_energy_kwh": 15236.415406427706,
+    "declared_flex_kw": 4295.844443192616,
+    "flex_duration_h": 3.546780058708131,
+    "reputation": 1.0,
+    "trade_cap_kwh": 1073.0,
+    "balance_usd": 0.0,
+    "stake_locked_usd": 0.0
+   },
+   {
+    "agent_id": "PVB_15",
+    "role": "seller",
+    "bus": 1,
+    "bess_power_kw": 2841.5427809671323,
+    "bess_energy_kwh": 7672.4960790707255,
+    "declared_flex_kw": 2841.5427809671323,
+    "flex_duration_h": 2.7001163348522086,
+    "reputation": 1.0,
+    "trade_cap_kwh": 710.0,
+    "balance_usd": 0.0,
+    "stake_locked_usd": 0.0
+   },
+   {
+    "agent_id": "PVB_11",
+    "role": "seller",
+    "bus": 74,
+    "bess_power_kw": 1643.433900752211,
+    "bess_energy_kwh": 3315.9585131697436,
+    "declared_flex_kw": 1643.433900752211,
+    "flex_duration_h": 2.017701175357285,
+    "reputation": 1.0,
+    "trade_cap_kwh": 410.0,
+    "balance_usd": 0.0,
+    "stake_locked_usd": 0.0
+   },
+   {
+    "agent_id": "PVB_36",
+    "role": "seller",
+    "bus": 28,
+    "bess_power_kw": 7045.629784328691,
+    "bess_energy_kwh": 14621.180430743387,
+    "declared_flex_kw": 7045.629784328691,
+    "flex_duration_h": 2.0752127032369323,
+    "reputation": 1.0,
+    "trade_cap_kwh": 1761.0,
+    "balance_usd": 208.70656910474602,
+    "stake_locked_usd": 1008.8614497212936
+   },
+   {
+    "agent_id": "AUD_01",
+    "role": "auditor",
+    "bus": null,
+    "bess_power_kw": null,
+    "bess_energy_kwh": null,
+    "declared_flex_kw": 0.0,
+    "flex_duration_h": null,
+    "reputation": 1.0,
+    "trade_cap_kwh": 0.0,
+    "balance_usd": 283.0104,
+    "stake_locked_usd": 0.0
+   }
+  ],
+  "offers": [
+   {
+    "offer_id": 1,
+    "from_agent": "COM_09",
+    "to_agent": "PVB_50",
+    "step_from": 68,
+    "step_to": 79,
+    "kwh_per_step": 3418.0,
+    "price_usd_mwh": 45.0,
+    "penalty_usd_mwh": 69.0,
+    "status": "accepted",
+    "round_opened": 1
+   },
+   {
+    "offer_id": 2,
+    "from_agent": "COM_09",
+    "to_agent": "PVB_36",
+    "step_from": 68,
+    "step_to": 79,
+    "kwh_per_step": 1761.0,
+    "price_usd_mwh": 45.0,
+    "penalty_usd_mwh": 69.0,
+    "status": "accepted",
+    "round_opened": 1
+   },
+   {
+    "offer_id": 3,
+    "from_agent": "COM_09",
+    "to_agent": "PVB_17",
+    "step_from": 68,
+    "step_to": 79,
+    "kwh_per_step": 763.0,
+    "price_usd_mwh": 45.0,
+    "penalty_usd_mwh": 69.0,
+    "status": "accepted",
+    "round_opened": 1
+   }
+  ],
+  "commitments": [
+   {
+    "commitment_id": 1,
+    "offer_id": 3,
+    "seller": "PVB_17",
+    "buyer": "COM_09",
+    "step_from": 68,
+    "step_to": 79,
+    "kwh_per_step": 763.0,
+    "price_usd_mwh": 45.0,
+    "penalty_usd_mwh": 69.0,
+    "stake_usd": 631.764,
+    "status": "active"
+   },
+   {
+    "commitment_id": 2,
+    "offer_id": 1,
+    "seller": "PVB_50",
+    "buyer": "COM_09",
+    "step_from": 68,
+    "step_to": 79,
+    "kwh_per_step": 3418.0,
+    "price_usd_mwh": 45.0,
+    "penalty_usd_mwh": 69.0,
+    "stake_usd": 2830.104,
+    "status": "challenged"
+   },
+   {
+    "commitment_id": 3,
+    "offer_id": 2,
+    "seller": "PVB_36",
+    "buyer": "COM_09",
+    "step_from": 68,
+    "step_to": 79,
+    "kwh_per_step": 1761.0,
+    "price_usd_mwh": 45.0,
+    "penalty_usd_mwh": 69.0,
+    "stake_usd": 1458.108,
+    "status": "active"
+   }
+  ],
+  "settlements": [
+   {
+    "id": 1,
+    "commitment_id": 1,
+    "step": 68,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 2,
+    "commitment_id": 1,
+    "step": 69,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 3,
+    "commitment_id": 1,
+    "step": 70,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 4,
+    "commitment_id": 1,
+    "step": 71,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 5,
+    "commitment_id": 1,
+    "step": 72,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 6,
+    "commitment_id": 1,
+    "step": 73,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 7,
+    "commitment_id": 1,
+    "step": 74,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 8,
+    "commitment_id": 1,
+    "step": 75,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 9,
+    "commitment_id": 1,
+    "step": 76,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 10,
+    "commitment_id": 1,
+    "step": 77,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 11,
+    "commitment_id": 1,
+    "step": 78,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 12,
+    "commitment_id": 1,
+    "step": 79,
+    "committed_kwh": 763.0,
+    "delivered_kwh": 763.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 34.335,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 13,
+    "commitment_id": 2,
+    "step": 68,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1709.3473554532657,
+    "shortfall_kwh": 1708.6526445467343,
+    "energy_usd": 76.92063099539695,
+    "penalty_usd": 117.89703247372466,
+    "grid_usd": 152.34346952706713
+   },
+   {
+    "id": 14,
+    "commitment_id": 2,
+    "step": 69,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1709.3473554532657,
+    "shortfall_kwh": 1708.6526445467343,
+    "energy_usd": 76.92063099539695,
+    "penalty_usd": 117.89703247372466,
+    "grid_usd": 152.34346952706713
+   },
+   {
+    "id": 15,
+    "commitment_id": 2,
+    "step": 70,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1709.3473554532657,
+    "shortfall_kwh": 1708.6526445467343,
+    "energy_usd": 76.92063099539695,
+    "penalty_usd": 117.89703247372466,
+    "grid_usd": 152.34346952706713
+   },
+   {
+    "id": 16,
+    "commitment_id": 2,
+    "step": 71,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1709.3473554532657,
+    "shortfall_kwh": 1708.6526445467343,
+    "energy_usd": 76.92063099539695,
+    "penalty_usd": 117.89703247372466,
+    "grid_usd": 152.34346952706713
+   },
+   {
+    "id": 17,
+    "commitment_id": 2,
+    "step": 72,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1709.3473554532657,
+    "shortfall_kwh": 1708.6526445467343,
+    "energy_usd": 76.92063099539695,
+    "penalty_usd": 117.89703247372466,
+    "grid_usd": 118.75135879599803
+   },
+   {
+    "id": 18,
+    "commitment_id": 2,
+    "step": 73,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1709.3473554532657,
+    "shortfall_kwh": 1708.6526445467343,
+    "energy_usd": 76.92063099539695,
+    "penalty_usd": 117.89703247372466,
+    "grid_usd": 118.75135879599803
+   },
+   {
+    "id": 19,
+    "commitment_id": 2,
+    "step": 74,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1709.3473554532657,
+    "shortfall_kwh": 1708.6526445467343,
+    "energy_usd": 76.92063099539695,
+    "penalty_usd": 117.89703247372466,
+    "grid_usd": 118.75135879599803
+   },
+   {
+    "id": 20,
+    "commitment_id": 2,
+    "step": 75,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1709.3473554532657,
+    "shortfall_kwh": 1708.6526445467343,
+    "energy_usd": 76.92063099539695,
+    "penalty_usd": 117.89703247372466,
+    "grid_usd": 118.75135879599803
+   },
+   {
+    "id": 21,
+    "commitment_id": 2,
+    "step": 76,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 1655.3926193598963,
+    "shortfall_kwh": 1762.6073806401037,
+    "energy_usd": 74.49266787119534,
+    "penalty_usd": 121.61990926416715,
+    "grid_usd": 106.54961750445698
+   },
+   {
+    "id": 22,
+    "commitment_id": 2,
+    "step": 77,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 0.0,
+    "shortfall_kwh": 3418.0,
+    "energy_usd": 0.0,
+    "penalty_usd": 235.842,
+    "grid_usd": 206.61810260772705
+   },
+   {
+    "id": 23,
+    "commitment_id": 2,
+    "step": 78,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 0.0,
+    "shortfall_kwh": 3418.0,
+    "energy_usd": 0.0,
+    "penalty_usd": 235.842,
+    "grid_usd": 206.61810260772705
+   },
+   {
+    "id": 24,
+    "commitment_id": 2,
+    "step": 79,
+    "committed_kwh": 3418.0,
+    "delivered_kwh": 0.0,
+    "shortfall_kwh": 3418.0,
+    "energy_usd": 0.0,
+    "penalty_usd": 235.842,
+    "grid_usd": 206.61810260772705
+   },
+   {
+    "id": 25,
+    "commitment_id": 3,
+    "step": 68,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 1761.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 79.24499999999999,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 26,
+    "commitment_id": 3,
+    "step": 69,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 1761.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 79.24499999999999,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 27,
+    "commitment_id": 3,
+    "step": 70,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 1761.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 79.24499999999999,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 28,
+    "commitment_id": 3,
+    "step": 71,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 1761.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 79.24499999999999,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 29,
+    "commitment_id": 3,
+    "step": 72,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 1761.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 79.24499999999999,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 30,
+    "commitment_id": 3,
+    "step": 73,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 1761.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 79.24499999999999,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 31,
+    "commitment_id": 3,
+    "step": 74,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 1761.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 79.24499999999999,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 32,
+    "commitment_id": 3,
+    "step": 75,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 1761.0,
+    "shortfall_kwh": 0.0,
+    "energy_usd": 79.24499999999999,
+    "penalty_usd": 0.0,
+    "grid_usd": 0.0
+   },
+   {
+    "id": 33,
+    "commitment_id": 3,
+    "step": 76,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 533.1804307433868,
+    "shortfall_kwh": 1227.8195692566132,
+    "energy_usd": 23.993119383452402,
+    "penalty_usd": 84.71955027870631,
+    "grid_usd": 74.22169389831426
+   },
+   {
+    "id": 34,
+    "commitment_id": 3,
+    "step": 77,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 0.0,
+    "shortfall_kwh": 1761.0,
+    "energy_usd": 0.0,
+    "penalty_usd": 121.50899999999999,
+    "grid_usd": 106.45245134353637
+   },
+   {
+    "id": 35,
+    "commitment_id": 3,
+    "step": 78,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 0.0,
+    "shortfall_kwh": 1761.0,
+    "energy_usd": 0.0,
+    "penalty_usd": 121.50899999999999,
+    "grid_usd": 106.45245134353637
+   },
+   {
+    "id": 36,
+    "commitment_id": 3,
+    "step": 79,
+    "committed_kwh": 1761.0,
+    "delivered_kwh": 0.0,
+    "shortfall_kwh": 1761.0,
+    "energy_usd": 0.0,
+    "penalty_usd": 121.50899999999999,
+    "grid_usd": 106.45245134353637
+   }
+  ],
+  "challenges": [
+   {
+    "id": 1,
+    "commitment_id": 2,
+    "auditor": "AUD_01",
+    "claim": "envelope exceeds nameplate",
+    "evidence": "PVB_50 declared_flex_kw 13674.8 vs battery nameplate 6837 kW (declared is about 2.0x nameplate)",
+    "verdict": "valid",
+    "bounty_usd": 283.0104
+   }
+  ],
+  "ledger": [
+   {
+    "seq": 1,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "COM_09",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"COM_09\",\"bus\":147,\"declared_flex_kw\":8727.0,\"flex_duration_h\":6.2,\"reputation\":1.0,\"role\":\"buyer\",\"trade_cap_kwh\":2181.0}",
+    "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash": "7ff9c89ea08736c55d9f9319808294ab415bf9c4e7a518c14cb616f7f46e43ea"
+   },
+   {
+    "seq": 2,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "PVB_17",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"PVB_17\",\"bus\":6,\"declared_flex_kw\":5454.6,\"flex_duration_h\":3.2,\"reputation\":1.0,\"role\":\"seller\",\"trade_cap_kwh\":1363.0}",
+    "prev_hash": "7ff9c89ea08736c55d9f9319808294ab415bf9c4e7a518c14cb616f7f46e43ea",
+    "hash": "dc1d44da081546e9a1d9fadd70b62da183f91f8e46f3b12acaebc6d022fc1ed6"
+   },
+   {
+    "seq": 3,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "PVB_37",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"PVB_37\",\"bus\":140,\"declared_flex_kw\":4869.3,\"flex_duration_h\":3.4,\"reputation\":1.0,\"role\":\"seller\",\"trade_cap_kwh\":1217.0}",
+    "prev_hash": "dc1d44da081546e9a1d9fadd70b62da183f91f8e46f3b12acaebc6d022fc1ed6",
+    "hash": "3d4dee4c8e09dd774a3e784b2f47bc64684440327f56b704863e0173b502f4ee"
+   },
+   {
+    "seq": 4,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "PVB_32",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"PVB_32\",\"bus\":197,\"declared_flex_kw\":3274.8,\"flex_duration_h\":2.3,\"reputation\":1.0,\"role\":\"seller\",\"trade_cap_kwh\":818.0}",
+    "prev_hash": "3d4dee4c8e09dd774a3e784b2f47bc64684440327f56b704863e0173b502f4ee",
+    "hash": "02949ae7f262461eaa409242f65692c471d2a11ef62a2c3b24c351469bede083"
+   },
+   {
+    "seq": 5,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "PVB_50",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"PVB_50\",\"bus\":156,\"declared_flex_kw\":13674.8,\"flex_duration_h\":2.2,\"reputation\":1.0,\"role\":\"seller\",\"trade_cap_kwh\":3418.0}",
+    "prev_hash": "02949ae7f262461eaa409242f65692c471d2a11ef62a2c3b24c351469bede083",
+    "hash": "b839f39d554c4e8a1bcfeb46affcf25cd4166b98d5385c2d4de880ee9405a520"
+   },
+   {
+    "seq": 6,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "PVB_01",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"PVB_01\",\"bus\":117,\"declared_flex_kw\":4295.8,\"flex_duration_h\":3.5,\"reputation\":1.0,\"role\":\"seller\",\"trade_cap_kwh\":1073.0}",
+    "prev_hash": "b839f39d554c4e8a1bcfeb46affcf25cd4166b98d5385c2d4de880ee9405a520",
+    "hash": "a39ae0ddae60366db2d432a0e84957276d8395376ed3c0d9281ab5f21964ffe4"
+   },
+   {
+    "seq": 7,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "PVB_15",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"PVB_15\",\"bus\":1,\"declared_flex_kw\":2841.5,\"flex_duration_h\":2.7,\"reputation\":1.0,\"role\":\"seller\",\"trade_cap_kwh\":710.0}",
+    "prev_hash": "a39ae0ddae60366db2d432a0e84957276d8395376ed3c0d9281ab5f21964ffe4",
+    "hash": "8fef52d6f8385c95b6c54260e83e104893d1baa6063e8f42e92f91e906374050"
+   },
+   {
+    "seq": 8,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "PVB_11",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"PVB_11\",\"bus\":74,\"declared_flex_kw\":1643.4,\"flex_duration_h\":2.0,\"reputation\":1.0,\"role\":\"seller\",\"trade_cap_kwh\":410.0}",
+    "prev_hash": "8fef52d6f8385c95b6c54260e83e104893d1baa6063e8f42e92f91e906374050",
+    "hash": "c8553505b6924b8941f0bbfae55112c82906df0a214e73e35db6347a6e2cd8a3"
+   },
+   {
+    "seq": 9,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "PVB_36",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"PVB_36\",\"bus\":28,\"declared_flex_kw\":7045.6,\"flex_duration_h\":2.1,\"reputation\":1.0,\"role\":\"seller\",\"trade_cap_kwh\":1761.0}",
+    "prev_hash": "c8553505b6924b8941f0bbfae55112c82906df0a214e73e35db6347a6e2cd8a3",
+    "hash": "9b6cbcc49959857dcf9725d00897ebad8edcb53ad599a8db7cef380fd6a27b37"
+   },
+   {
+    "seq": 10,
+    "ts": "2026-11-04T04:25:05+00:00",
+    "agent_id": "AUD_01",
+    "action": "register",
+    "payload_json": "{\"agent_id\":\"AUD_01\",\"bus\":null,\"declared_flex_kw\":0.0,\"flex_duration_h\":null,\"reputation\":1.0,\"role\":\"auditor\",\"trade_cap_kwh\":0.0}",
+    "prev_hash": "9b6cbcc49959857dcf9725d00897ebad8edcb53ad599a8db7cef380fd6a27b37",
+    "hash": "a3edc8e5c6f32c894a0b26a457059bd0634e5a96d204581911207e54a881aa94"
+   },
+   {
+    "seq": 11,
+    "ts": "2026-11-04T04:25:10+00:00",
+    "agent_id": "COM_09",
+    "action": "propose",
+    "payload_json": "{\"kwh_per_step\":3418.0,\"offer_id\":1,\"penalty_usd_mwh\":69.0,\"price_usd_mwh\":45.0,\"step_from\":68,\"step_to\":79,\"to\":\"PVB_50\"}",
+    "prev_hash": "a3edc8e5c6f32c894a0b26a457059bd0634e5a96d204581911207e54a881aa94",
+    "hash": "67a3a4d3a9e8963e56019e979bf30bf0b3942d17f3b11e3c6ce3234e533818db"
+   },
+   {
+    "seq": 12,
+    "ts": "2026-11-04T04:25:11+00:00",
+    "agent_id": "COM_09",
+    "action": "propose",
+    "payload_json": "{\"kwh_per_step\":1761.0,\"offer_id\":2,\"penalty_usd_mwh\":69.0,\"price_usd_mwh\":45.0,\"step_from\":68,\"step_to\":79,\"to\":\"PVB_36\"}",
+    "prev_hash": "67a3a4d3a9e8963e56019e979bf30bf0b3942d17f3b11e3c6ce3234e533818db",
+    "hash": "bb3c6d53dfc1a81d6c6cc9325ee94801daac519c2c02f6bdd89063d7d9a13801"
+   },
+   {
+    "seq": 13,
+    "ts": "2026-11-04T04:25:11+00:00",
+    "agent_id": "COM_09",
+    "action": "propose",
+    "payload_json": "{\"kwh_per_step\":763.0,\"offer_id\":3,\"penalty_usd_mwh\":69.0,\"price_usd_mwh\":45.0,\"step_from\":68,\"step_to\":79,\"to\":\"PVB_17\"}",
+    "prev_hash": "bb3c6d53dfc1a81d6c6cc9325ee94801daac519c2c02f6bdd89063d7d9a13801",
+    "hash": "0860d6d95f86306c7ee8e0fcc7a8e40f64058feba442a02bd726bbb332c9ac9f"
+   },
+   {
+    "seq": 14,
+    "ts": "2026-11-04T04:25:17+00:00",
+    "agent_id": "PVB_17",
+    "action": "commit",
+    "payload_json": "{\"buyer\":\"COM_09\",\"commitment_id\":1,\"kwh_per_step\":763.0,\"offer_id\":3,\"penalty_usd_mwh\":69.0,\"price_usd_mwh\":45.0,\"seller\":\"PVB_17\",\"stake_usd\":631.76,\"step_from\":68,\"step_to\":79}",
+    "prev_hash": "0860d6d95f86306c7ee8e0fcc7a8e40f64058feba442a02bd726bbb332c9ac9f",
+    "hash": "d61a3f9cb19ae8bad4d80083f90fea9af3c13da04ab23db26f963554d1d8f8f9"
+   },
+   {
+    "seq": 15,
+    "ts": "2026-11-04T04:25:21+00:00",
+    "agent_id": "PVB_50",
+    "action": "commit",
+    "payload_json": "{\"buyer\":\"COM_09\",\"commitment_id\":2,\"kwh_per_step\":3418.0,\"offer_id\":1,\"penalty_usd_mwh\":69.0,\"price_usd_mwh\":45.0,\"seller\":\"PVB_50\",\"stake_usd\":2830.1,\"step_from\":68,\"step_to\":79}",
+    "prev_hash": "d61a3f9cb19ae8bad4d80083f90fea9af3c13da04ab23db26f963554d1d8f8f9",
+    "hash": "f71f354b84042b4201a98537f59d7ee5cb5091a2da734cd5c88a74e3859b8df0"
+   },
+   {
+    "seq": 16,
+    "ts": "2026-11-04T04:25:26+00:00",
+    "agent_id": "PVB_36",
+    "action": "commit",
+    "payload_json": "{\"buyer\":\"COM_09\",\"commitment_id\":3,\"kwh_per_step\":1761.0,\"offer_id\":2,\"penalty_usd_mwh\":69.0,\"price_usd_mwh\":45.0,\"seller\":\"PVB_36\",\"stake_usd\":1458.11,\"step_from\":68,\"step_to\":79}",
+    "prev_hash": "f71f354b84042b4201a98537f59d7ee5cb5091a2da734cd5c88a74e3859b8df0",
+    "hash": "6f5b3a94723192911edc2671ec48c3f8a60bab48d421157b854d64cde396eeb5"
+   },
+   {
+    "seq": 17,
+    "ts": "2026-11-04T04:25:36+00:00",
+    "agent_id": "AUD_01",
+    "action": "challenge",
+    "payload_json": "{\"bond_usd\":0,\"bounty_usd\":283.01,\"claim\":\"envelope exceeds nameplate\",\"commitment_id\":2,\"declared_flex_kw\":13674.778843626125,\"evidence\":\"PVB_50 declared_flex_kw 13674.8 vs battery nameplate 6837 kW (declared is about 2.0x nameplate)\",\"nameplate_kw\":6837.389421813063,\"seller\":\"PVB_50\",\"verdict\":\"valid\"}",
+    "prev_hash": "6f5b3a94723192911edc2671ec48c3f8a60bab48d421157b854d64cde396eeb5",
+    "hash": "2f1397e38520f92c8a210d98e665d8b934d0df17e77fe90a3e16bd491c45f77a"
+   },
+   {
+    "seq": 18,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":68}",
+    "prev_hash": "2f1397e38520f92c8a210d98e665d8b934d0df17e77fe90a3e16bd491c45f77a",
+    "hash": "c6e855b6844c015a96aa7b9d9d2033d6fdaae372ca2add0cd40c33320804f3de"
+   },
+   {
+    "seq": 19,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":69}",
+    "prev_hash": "c6e855b6844c015a96aa7b9d9d2033d6fdaae372ca2add0cd40c33320804f3de",
+    "hash": "6233f2f1d341ef44c3080dc12281cb78534c13fe746ffc1d24d6a5f8e2b58222"
+   },
+   {
+    "seq": 20,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":70}",
+    "prev_hash": "6233f2f1d341ef44c3080dc12281cb78534c13fe746ffc1d24d6a5f8e2b58222",
+    "hash": "9053f9d1c87a813b2d1cf9bf31e12250cc364ad44def394d83f455644a755fb8"
+   },
+   {
+    "seq": 21,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":71}",
+    "prev_hash": "9053f9d1c87a813b2d1cf9bf31e12250cc364ad44def394d83f455644a755fb8",
+    "hash": "2279fbde16fac41d3853e565b09320894e0ecac580105cbd047dc776028bdb4b"
+   },
+   {
+    "seq": 22,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":72}",
+    "prev_hash": "2279fbde16fac41d3853e565b09320894e0ecac580105cbd047dc776028bdb4b",
+    "hash": "d0d57402148dc28c6524034685e571fe5647b18e0ce2c30a629cc9ba017063a6"
+   },
+   {
+    "seq": 23,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":73}",
+    "prev_hash": "d0d57402148dc28c6524034685e571fe5647b18e0ce2c30a629cc9ba017063a6",
+    "hash": "05147fb7b2937ffc274fa0c5a69d076c32b92aeadca26f5e116db075e12579e3"
+   },
+   {
+    "seq": 24,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":74}",
+    "prev_hash": "05147fb7b2937ffc274fa0c5a69d076c32b92aeadca26f5e116db075e12579e3",
+    "hash": "c7596565a709b7c8f3f93366130beacc90275348aafa8db7d728cb9ddb006384"
+   },
+   {
+    "seq": 25,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":75}",
+    "prev_hash": "c7596565a709b7c8f3f93366130beacc90275348aafa8db7d728cb9ddb006384",
+    "hash": "3df83f84f05ee0e164d75254fd2047c5d8d5484756ca5f9efcc6d6a88cdb7300"
+   },
+   {
+    "seq": 26,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":76}",
+    "prev_hash": "3df83f84f05ee0e164d75254fd2047c5d8d5484756ca5f9efcc6d6a88cdb7300",
+    "hash": "c4dcc6e35a68659aa80077ad3be3089e30bbe50e18e16c29f18a8dfaa744814b"
+   },
+   {
+    "seq": 27,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":77}",
+    "prev_hash": "c4dcc6e35a68659aa80077ad3be3089e30bbe50e18e16c29f18a8dfaa744814b",
+    "hash": "fc61ed12f37d5dcc674e0be6b1c662a7cca773b8726c0d9908f3e1c93b69cc43"
+   },
+   {
+    "seq": 28,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":78}",
+    "prev_hash": "fc61ed12f37d5dcc674e0be6b1c662a7cca773b8726c0d9908f3e1c93b69cc43",
+    "hash": "c9b4e2349af2c8120dfcc31490ee67ee2d50963ef588e2ee11be69896e006dc5"
+   },
+   {
+    "seq": 29,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":1,\"committed_kwh\":763.0,\"delivered_kwh\":763.0,\"energy_usd\":34.335,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":79}",
+    "prev_hash": "c9b4e2349af2c8120dfcc31490ee67ee2d50963ef588e2ee11be69896e006dc5",
+    "hash": "47855f6b375fe677f0d2e01450356beac63e4c0d6fc57de23f466f9e7bf6570c"
+   },
+   {
+    "seq": 30,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1709.347,\"energy_usd\":76.9206,\"grid_usd\":152.3435,\"penalty_usd\":117.897,\"shortfall_kwh\":1708.653,\"step\":68}",
+    "prev_hash": "47855f6b375fe677f0d2e01450356beac63e4c0d6fc57de23f466f9e7bf6570c",
+    "hash": "503dc2e2473c767b43be290dcf2f45747a06d61fb48fb228ada505c6c6894234"
+   },
+   {
+    "seq": 31,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1709.347,\"energy_usd\":76.9206,\"grid_usd\":152.3435,\"penalty_usd\":117.897,\"shortfall_kwh\":1708.653,\"step\":69}",
+    "prev_hash": "503dc2e2473c767b43be290dcf2f45747a06d61fb48fb228ada505c6c6894234",
+    "hash": "9fe79803986d22d76f1b01335ca273f3ced2e3014117ae524bf3659bea9b2085"
+   },
+   {
+    "seq": 32,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1709.347,\"energy_usd\":76.9206,\"grid_usd\":152.3435,\"penalty_usd\":117.897,\"shortfall_kwh\":1708.653,\"step\":70}",
+    "prev_hash": "9fe79803986d22d76f1b01335ca273f3ced2e3014117ae524bf3659bea9b2085",
+    "hash": "968ede954e3666316e45aed3e6dbc021ef61c71203ba538e6551e17964e41e51"
+   },
+   {
+    "seq": 33,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1709.347,\"energy_usd\":76.9206,\"grid_usd\":152.3435,\"penalty_usd\":117.897,\"shortfall_kwh\":1708.653,\"step\":71}",
+    "prev_hash": "968ede954e3666316e45aed3e6dbc021ef61c71203ba538e6551e17964e41e51",
+    "hash": "dfe7275e6f98f60446686f933e3b794d24e0ea72796a1d4cfab540eda2d5d332"
+   },
+   {
+    "seq": 34,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1709.347,\"energy_usd\":76.9206,\"grid_usd\":118.7514,\"penalty_usd\":117.897,\"shortfall_kwh\":1708.653,\"step\":72}",
+    "prev_hash": "dfe7275e6f98f60446686f933e3b794d24e0ea72796a1d4cfab540eda2d5d332",
+    "hash": "0afebc45f15d45f8a3145f09d69b34c78c20bd62784fe131f9a14445a5472c86"
+   },
+   {
+    "seq": 35,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1709.347,\"energy_usd\":76.9206,\"grid_usd\":118.7514,\"penalty_usd\":117.897,\"shortfall_kwh\":1708.653,\"step\":73}",
+    "prev_hash": "0afebc45f15d45f8a3145f09d69b34c78c20bd62784fe131f9a14445a5472c86",
+    "hash": "688f7f899b0c5cc81c8ef4ea09710bd3a4d28c1201aea51cf5c61721183a7e8a"
+   },
+   {
+    "seq": 36,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1709.347,\"energy_usd\":76.9206,\"grid_usd\":118.7514,\"penalty_usd\":117.897,\"shortfall_kwh\":1708.653,\"step\":74}",
+    "prev_hash": "688f7f899b0c5cc81c8ef4ea09710bd3a4d28c1201aea51cf5c61721183a7e8a",
+    "hash": "d18dae04b35954ed5f78cfcfe4c9006bd3c94ca433cde82b7fc5068592041d06"
+   },
+   {
+    "seq": 37,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1709.347,\"energy_usd\":76.9206,\"grid_usd\":118.7514,\"penalty_usd\":117.897,\"shortfall_kwh\":1708.653,\"step\":75}",
+    "prev_hash": "d18dae04b35954ed5f78cfcfe4c9006bd3c94ca433cde82b7fc5068592041d06",
+    "hash": "aa02469cef9cf0ee7819bdcbe6ba8c95547df737ac4074bb404059baa863e466"
+   },
+   {
+    "seq": 38,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":1655.393,\"energy_usd\":74.4927,\"grid_usd\":106.5496,\"penalty_usd\":121.6199,\"shortfall_kwh\":1762.607,\"step\":76}",
+    "prev_hash": "aa02469cef9cf0ee7819bdcbe6ba8c95547df737ac4074bb404059baa863e466",
+    "hash": "ca3fdb349ff110a184b9fb6c4f8b1e1144a38043f2b175c8d6f21753ed9cc467"
+   },
+   {
+    "seq": 39,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":0.0,\"energy_usd\":0.0,\"grid_usd\":206.6181,\"penalty_usd\":235.842,\"shortfall_kwh\":3418.0,\"step\":77}",
+    "prev_hash": "ca3fdb349ff110a184b9fb6c4f8b1e1144a38043f2b175c8d6f21753ed9cc467",
+    "hash": "e0382cc6260b6ec42648f297566b1aaedf4b7ea1c14c563f9e7783f4581268fd"
+   },
+   {
+    "seq": 40,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":0.0,\"energy_usd\":0.0,\"grid_usd\":206.6181,\"penalty_usd\":235.842,\"shortfall_kwh\":3418.0,\"step\":78}",
+    "prev_hash": "e0382cc6260b6ec42648f297566b1aaedf4b7ea1c14c563f9e7783f4581268fd",
+    "hash": "7dcd918ab846b857969d97446e660073296222480ef7c454b6e8f518610ba43c"
+   },
+   {
+    "seq": 41,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":2,\"committed_kwh\":3418.0,\"delivered_kwh\":0.0,\"energy_usd\":0.0,\"grid_usd\":206.6181,\"penalty_usd\":235.842,\"shortfall_kwh\":3418.0,\"step\":79}",
+    "prev_hash": "7dcd918ab846b857969d97446e660073296222480ef7c454b6e8f518610ba43c",
+    "hash": "7d314eae186d34f6c3256e38321c7ce2e35da10c0903a8137cf2869fd0dbbfd4"
+   },
+   {
+    "seq": 42,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":1761.0,\"energy_usd\":79.245,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":68}",
+    "prev_hash": "7d314eae186d34f6c3256e38321c7ce2e35da10c0903a8137cf2869fd0dbbfd4",
+    "hash": "31811350a0ef39c8f484baa7d1e25c24963a63f236857bcee7c5a7d1e8c24088"
+   },
+   {
+    "seq": 43,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":1761.0,\"energy_usd\":79.245,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":69}",
+    "prev_hash": "31811350a0ef39c8f484baa7d1e25c24963a63f236857bcee7c5a7d1e8c24088",
+    "hash": "ab8c21009f19b4ab539bc5ee2d52f3e7851ea852f3a1d9efd55b9e17e01526d1"
+   },
+   {
+    "seq": 44,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":1761.0,\"energy_usd\":79.245,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":70}",
+    "prev_hash": "ab8c21009f19b4ab539bc5ee2d52f3e7851ea852f3a1d9efd55b9e17e01526d1",
+    "hash": "7870455d2fd3ba65edd4f3beab32ae6e0b9b6e9b69512d440034abfc3d773f9b"
+   },
+   {
+    "seq": 45,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":1761.0,\"energy_usd\":79.245,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":71}",
+    "prev_hash": "7870455d2fd3ba65edd4f3beab32ae6e0b9b6e9b69512d440034abfc3d773f9b",
+    "hash": "e3665533b86c30305a11899cc98ccd019a3c03cc1a983f5e09b006d47ec76287"
+   },
+   {
+    "seq": 46,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":1761.0,\"energy_usd\":79.245,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":72}",
+    "prev_hash": "e3665533b86c30305a11899cc98ccd019a3c03cc1a983f5e09b006d47ec76287",
+    "hash": "c536eb41e084716f6a5c780c9d4c52c3c33871ecdc5542f09b9fee7516550273"
+   },
+   {
+    "seq": 47,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":1761.0,\"energy_usd\":79.245,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":73}",
+    "prev_hash": "c536eb41e084716f6a5c780c9d4c52c3c33871ecdc5542f09b9fee7516550273",
+    "hash": "7cd99d83fd17d8825deca0a6b704befeabd1c67b546470bf66a67887b5330000"
+   },
+   {
+    "seq": 48,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":1761.0,\"energy_usd\":79.245,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":74}",
+    "prev_hash": "7cd99d83fd17d8825deca0a6b704befeabd1c67b546470bf66a67887b5330000",
+    "hash": "c6dc78e332f2b63be9c25b01ae0aecad35e8c5e3ce89006a80fa8cdde7f7451f"
+   },
+   {
+    "seq": 49,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":1761.0,\"energy_usd\":79.245,\"grid_usd\":0.0,\"penalty_usd\":0.0,\"shortfall_kwh\":0.0,\"step\":75}",
+    "prev_hash": "c6dc78e332f2b63be9c25b01ae0aecad35e8c5e3ce89006a80fa8cdde7f7451f",
+    "hash": "b46922465667dbb5b5d8d310742f4d2cb3afb80082b63a1d662f1179d9b69207"
+   },
+   {
+    "seq": 50,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":533.18,\"energy_usd\":23.9931,\"grid_usd\":74.2217,\"penalty_usd\":84.7196,\"shortfall_kwh\":1227.82,\"step\":76}",
+    "prev_hash": "b46922465667dbb5b5d8d310742f4d2cb3afb80082b63a1d662f1179d9b69207",
+    "hash": "2d7f31a4dfdc9616de8b57f8d72af5224001cf3ca31280fd863b635d837e4482"
+   },
+   {
+    "seq": 51,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":0.0,\"energy_usd\":0.0,\"grid_usd\":106.4525,\"penalty_usd\":121.509,\"shortfall_kwh\":1761.0,\"step\":77}",
+    "prev_hash": "2d7f31a4dfdc9616de8b57f8d72af5224001cf3ca31280fd863b635d837e4482",
+    "hash": "20ee4c9dda50eab2c05e1687148df81a706d13b03b86af1da1a05ce8e30a2e99"
+   },
+   {
+    "seq": 52,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":0.0,\"energy_usd\":0.0,\"grid_usd\":106.4525,\"penalty_usd\":121.509,\"shortfall_kwh\":1761.0,\"step\":78}",
+    "prev_hash": "20ee4c9dda50eab2c05e1687148df81a706d13b03b86af1da1a05ce8e30a2e99",
+    "hash": "fa84af72e59034066c3989de5764e9330a4d6f786ea5dbf6d54f93ac7cdde01d"
+   },
+   {
+    "seq": 53,
+    "ts": "2026-11-04T04:25:37+00:00",
+    "agent_id": "gridpact",
+    "action": "settle",
+    "payload_json": "{\"commitment_id\":3,\"committed_kwh\":1761.0,\"delivered_kwh\":0.0,\"energy_usd\":0.0,\"grid_usd\":106.4525,\"penalty_usd\":121.509,\"shortfall_kwh\":1761.0,\"step\":79}",
+    "prev_hash": "fa84af72e59034066c3989de5764e9330a4d6f786ea5dbf6d54f93ac7cdde01d",
+    "hash": "aed3407522641f52de1d796f626fd1096344b833e14573fbff683409ea7d771d"
+   }
+  ]
+ }
+}

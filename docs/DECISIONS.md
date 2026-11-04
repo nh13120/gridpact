@@ -27,3 +27,16 @@ One or two lines each. Newest at the bottom.
 - **`verify.py` restates constants and re-implements the hash** instead of importing them: if it imported `gridpact/`, a bug there would be verified against itself. The chosen day is read from the `kv` table, which `orchestrate.py` writes.
 - **Truth columns are read only in `verify.py`**: `bess_power_true_kw` (max over the year) confirms each seller's real battery power; metadata `flex_up_kw` is the honest envelope.
 - **Code review (Phase 6) fixes**: verify.py now derives "real" power from the truth column (not metadata), checks every expected step (a skipped step is a FAIL), flags commitments with no offer row, and shares power/energy budgets per seller across commitments (settle.py too). verify.py opens the DB read-only and fails fast if it is missing.
+
+## Benchmark (HW7, `benchmark/`)
+
+- **Preregistered before any run** (`benchmark/PREREGISTRATION.md`): claim, baseline, metrics, pass/fail, cases, seeds, budget. Changes after that are dated amendments in the same file.
+- **Baseline = ablation, not a weaker agent**: same prompts, model, limits; `settle_day(trust=True)` pays on the claim, no penalty, no auditor. "Plain bilateral" baseline skipped: the only protocol rule that bites in negotiation is the cap check, and the liar's cap is already inflated.
+- **Audit runs before settlement in the benchmark** (not after, as in `orchestrate.py`) so "caught before settlement" is literal; the scorer checks the ledger order.
+- **Ground truth = metadata nameplate**, asserted equal to max `bess_power_true_kw` at scorer load; the scorer recomputes delivery itself, never trusts the DB's `delivered_kwh` (it checks it in gridpact runs).
+- **Each run is a child process with its own port and DB** (`GRIDPACT_PORT`, `GRIDPACT_DB`): `gridpact.config` reads env once at import, so parallel runs need separate processes.
+- **`register_agent` accepts any registry entity** (was hard-coded to the three HW6 ids).
+- **The SDK's turn cap counts assistant messages, not tool calls**: a 2-turn auditor still filed two challenges by calling tools in parallel. And the SDK raises after delivering an `error_max_turns` result; `run_agent.py` keeps the turn.
+- **Rounding trap found by the benchmark**: the ledger shows `declared_flex_kw` to one decimal (6837.4) and the auditor's task text gave the nameplate as a whole number (6837); twice the auditor challenged an honest seller over 0.4 kW and lost the bond. The auditor's prompt says "exceeds nameplate" while the server's rule is 1.1x, so a 1.08x liar was challenged 5/5 times and ruled invalid each time. Left as found in v1; documented, not fixed, because the Phase 3 evidence pointed elsewhere.
+- **Haiku would not collude**: told it had a side deal with PVB_06, the auditor challenged PVB_06 anyway in 5/5 runs. Same model property that stopped it lying as a seller in HW6.
+- **Where GridPact stops helping (v1 stress sweep)**: from 6 sellers the buyer fills its need on paper from the nearest four, two with doubled caps, and never contacts the honest rest; coverage stays at 65% in both conditions. Catching the liar refunds money but not energy. v2 change: a valid challenge trims the commitment to the real cap and the released volume goes back to market for one round.

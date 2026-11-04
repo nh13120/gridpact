@@ -89,10 +89,10 @@ def register_agent(agent_id: str, role: str, declared_flex_kw: float | None = No
         return {"ok": False, "reason": "role must be buyer, seller or auditor"}
     if _agent_by_id(agent_id):
         return {"ok": False, "reason": f"{agent_id} is already registered"}
-    meta = data.load_metadata((agent_id,)) if agent_id in data.AGENTS else None
-    m = meta.loc[agent_id] if meta is not None and len(meta) else None
+    meta = data.load_metadata((agent_id,))   # any entity in the ENGIE registry may register
+    m = meta.loc[agent_id] if len(meta) else None
     if role != "auditor" and m is None:
-        return {"ok": False, "reason": f"{agent_id} is not one of this run's physical agents {list(data.AGENTS)}"}
+        return {"ok": False, "reason": f"{agent_id} is not in the ENGIE registry"}
     if declared_flex_kw is not None and not (_finite(declared_flex_kw) and declared_flex_kw > 0):
         return {"ok": False, "reason": "declared_flex_kw must be a finite number > 0"}
     if m is not None and role != {"community": "buyer", "pv_bess": "seller"}[m.entity_type]:
@@ -300,8 +300,10 @@ def set_round(n):
 
 def launch(timeout=15):
     """Start the server as a subprocess and wait until the port answers. Returns the Popen."""
+    import os
+    log_path = os.environ.get("GRIDPACT_SERVER_LOG", ROOT / "server.log")   # per-run file in the benchmark
     proc = subprocess.Popen([sys.executable, "-m", "gridpact.server"], cwd=ROOT,  # importable from any cwd
-                            stdout=subprocess.DEVNULL, stderr=open(ROOT / "server.log", "w"))  # errors land in server.log
+                            stdout=subprocess.DEVNULL, stderr=open(log_path, "w"))  # errors land in server.log
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:
