@@ -15,6 +15,7 @@ deterministic settlement and an independent verifier. Spec in `PLAN.md`, status 
 ## Test
 - `pytest` — ledger, settlement, adjudication and trim tests
 - `python -m tests.smoke_client` — one trade over MCP without an LLM
+- No ENGIE data? `GRIDPACT_DATA_DIR=fixtures/synthetic` runs the server, smoke client and `tests/test_fixture_day.py` on made-up numbers (`python -m gridpact.fixture` regenerates them)
 
 ## Benchmark (HW7, `benchmark/`)
 - Spec: `benchmark/PREREGISTRATION.md` (fixed before runs; amendments dated). Results: `benchmark/README.md`.
