@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS offers (
     price_usd_mwh   REAL NOT NULL,
     penalty_usd_mwh REAL NOT NULL,            -- paid per MWh of shortfall
     status          TEXT NOT NULL DEFAULT 'open', -- open | accepted | rejected | expired
-    round_opened    INTEGER NOT NULL DEFAULT 0
+    round_opened    INTEGER NOT NULL DEFAULT 0,
+    request_id      TEXT                      -- optional client key: a retried propose returns the same offer
 );
 CREATE TABLE IF NOT EXISTS commitments (
     commitment_id   INTEGER PRIMARY KEY,
@@ -90,6 +91,11 @@ def connect(path=DB_PATH):
     conn = sqlite3.connect(path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    if "request_id" not in {r[1] for r in conn.execute("PRAGMA table_info(offers)")}:   # database from before HW8
+        conn.execute("ALTER TABLE offers ADD COLUMN request_id TEXT")
+    # one offer per (sender, request_id); offers without a request_id are not constrained
+    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS one_offer_per_request ON offers(from_agent, request_id) "
+                 "WHERE request_id IS NOT NULL")
     return conn
 
 

@@ -1,9 +1,10 @@
 """One GridPact day with no LLM, on the synthetic fixture: register, trade, challenge, settle.
 
-    GRIDPACT_DATA_DIR=fixtures/synthetic GRIDPACT_DB=/tmp/day.db python -m tests.scripted_day [--repeat-propose]
+    GRIDPACT_DATA_DIR=fixtures/synthetic GRIDPACT_DB=/tmp/day.db python -m tests.scripted_day [--repeat-propose [--request-id]]
 
 Prints one JSON line. --repeat-propose sends the buyer's proposal to PVB_17 twice (a retried request)
-and accepts both, to show what the protocol does with a duplicate. Used by tests/test_fixture_day.py
+and accepts the result both times, to show what the protocol does with a duplicate. With --request-id
+both sends carry the same request_id. Used by tests/test_fixture_day.py
 and as the reference behaviour for the Nanda Town bridge.
 """
 import json
@@ -15,7 +16,7 @@ from gridpact.config import STEP_H
 LO, HI = 68, 79
 
 
-def main(repeat=False):
+def main(repeat=False, with_id=False):
     db.reset()
     buyer = server.register_agent("COM_09", "buyer")
     honest = server.register_agent("PVB_17", "seller")
@@ -28,10 +29,12 @@ def main(repeat=False):
         kwh = cap if seller == "PVB_37" else 500
         sends = 2 if (repeat and seller == "PVB_17") else 1
         for _ in range(sends):
-            o = server.propose(buyer["token"], seller, LO, HI, kwh, 45.0, 60.0)
+            o = server.propose(buyer["token"], seller, LO, HI, kwh, 45.0, 60.0,
+                               request_id=f"req-{seller}" if with_id else None)
             assert o["ok"], o
             r = server.respond(tok, o["offer_id"], "accept")
-            commits.setdefault(seller, []).append(r)
+            if r["ok"]:
+                commits.setdefault(seller, []).append(r)
     ch = [dict(c) for c in server.conn_().execute("SELECT * FROM commitments WHERE seller = 'PVB_37'")]
     verdict = server.challenge(auditor["token"], ch[0]["commitment_id"], "envelope exceeds nameplate",
                                "declared 5000 kW vs 2500 kW battery")
@@ -51,4 +54,4 @@ def main(repeat=False):
 
 
 if __name__ == "__main__":
-    main("--repeat-propose" in sys.argv)
+    main("--repeat-propose" in sys.argv, "--request-id" in sys.argv)

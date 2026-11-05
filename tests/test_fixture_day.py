@@ -32,11 +32,18 @@ def test_day_runs_end_to_end(tmp_path):
     assert liar["delivered"] == liar["committed"]
 
 
-def test_repeated_propose_is_not_deduplicated(tmp_path):
-    """KNOWN GAP, recorded on purpose: a retried `propose` creates a second offer, and accepting both
-    double-books the seller. Re-accepting the SAME offer is refused, but there is no request id.
-    A client (for example the Nanda Town bridge) must deduplicate retries itself, or the server must
-    gain an idempotency key. If that is fixed, flip this test."""
+def test_repeated_propose_without_request_id_still_double_books(tmp_path):
+    """Backwards compatible: a client that sends no request_id gets the old behaviour. A retried
+    `propose` opens a second offer and accepting both double-books the seller (12000 kWh, not 6000)."""
     out = run_day(tmp_path, "--repeat-propose")
     assert out["commitments"]["PVB_17"] == 2
-    assert out["settled"]["PVB_17"]["committed"] == 12000.0      # twice the 6000 kWh the buyer asked for
+    assert out["settled"]["PVB_17"]["committed"] == 12000.0
+
+
+def test_repeated_propose_with_request_id_is_one_trade(tmp_path):
+    """The HW8 fix: the same request_id returns the original offer, so the retry changes nothing.
+    The second accept is refused (offer already accepted) and the seller is booked once."""
+    out = run_day(tmp_path, "--repeat-propose", "--request-id")
+    assert out["commitments"]["PVB_17"] == 1
+    assert out["settled"]["PVB_17"]["committed"] == 6000.0
+    assert out["ledger_ok"] is True

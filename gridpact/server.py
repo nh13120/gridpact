@@ -131,11 +131,14 @@ def find_counterparties(token: str) -> dict:
 
 @mcp.tool()
 def propose(token: str, to: str, step_from: int, step_to: int, kwh_per_step: float,
-            price_usd_mwh: float, penalty_usd_mwh: float) -> dict:
+            price_usd_mwh: float, penalty_usd_mwh: float, request_id: str | None = None) -> dict:
     """Offer a trade: `kwh_per_step` delivered in every 15-min step from step_from to
     step_to (inclusive, 0..95, step 68 = 17:00 local) at `price_usd_mwh`. The seller
     pays `penalty_usd_mwh` per MWh it fails to deliver, from a stake locked at acceptance.
-    The seller side (you or `to`) must have the cap for it."""
+    The seller side (you or `to`) must have the cap for it.
+    Optional `request_id`: if you may retry this call (a timeout, a redelivered message), pass the same
+    id each time. A repeat with identical terms returns the original offer instead of opening a second
+    one; the same id with different terms is refused."""
     me = _agent(token)
     if not me:
         return {"ok": False, "reason": "unknown token"}
@@ -148,19 +151,31 @@ def propose(token: str, to: str, step_from: int, step_to: int, kwh_per_step: flo
         return {"ok": False, "reason": f"steps must satisfy 0 <= step_from <= step_to < {N_STEPS}"}
     if not _finite(kwh_per_step, price_usd_mwh, penalty_usd_mwh) or kwh_per_step <= 0 or price_usd_mwh <= 0 or penalty_usd_mwh < 0:
         return {"ok": False, "reason": "kwh_per_step and price must be finite and > 0, penalty finite and >= 0"}
+    if request_id is not None and not (isinstance(request_id, str) and 0 < len(request_id) <= 128):
+        return {"ok": False, "reason": "request_id must be a string of 1 to 128 characters"}
     seller = me if me["role"] == "seller" else other
     with _write:
-        return _propose_locked(me, seller, to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh)
+        return _propose_locked(me, seller, to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh, request_id)
 
 
-def _propose_locked(me, seller, to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh):
+def _propose_locked(me, seller, to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh, request_id=None):
+    if request_id is not None:
+        prior = conn_().execute("SELECT * FROM offers WHERE from_agent = ? AND request_id = ?",
+                                (me["agent_id"], request_id)).fetchone()
+        if prior:
+            same = (prior["to_agent"], prior["step_from"], prior["step_to"], prior["kwh_per_step"],
+                    prior["price_usd_mwh"], prior["penalty_usd_mwh"]) == (to, step_from, step_to, kwh_per_step,
+                                                                         price_usd_mwh, penalty_usd_mwh)
+            if not same:
+                return {"ok": False, "reason": f"request_id {request_id} was already used with different terms"}
+            return {"ok": True, "offer_id": prior["offer_id"], "status": prior["status"], "duplicate": True}
     room = seller["trade_cap_kwh"] - _committed_kwh(seller["agent_id"], step_from, step_to)
     if kwh_per_step > room + 1e-9:
         return {"ok": False, "reason": f"{seller['agent_id']} can commit at most {math.floor(room)} kWh/step in that window"}
     cur = conn_().execute(
         "INSERT INTO offers (from_agent, to_agent, step_from, step_to, kwh_per_step, "
-        "price_usd_mwh, penalty_usd_mwh, round_opened) VALUES (?,?,?,?,?,?,?,?)",
-        (me["agent_id"], to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh, _round()))
+        "price_usd_mwh, penalty_usd_mwh, round_opened, request_id) VALUES (?,?,?,?,?,?,?,?,?)",
+        (me["agent_id"], to, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh, _round(), request_id))
     offer_id = cur.lastrowid
     payload = {"offer_id": offer_id, "to": to, "step_from": step_from, "step_to": step_to,
                "kwh_per_step": kwh_per_step, "price_usd_mwh": price_usd_mwh, "penalty_usd_mwh": penalty_usd_mwh}

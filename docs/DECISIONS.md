@@ -45,3 +45,6 @@ One or two lines each. Newest at the bottom.
 
 ## HW8: synthetic fixture instead of the sponsor data (2026-11-05)
 The ENGIE parquet files are sponsor data (136 MB) and cannot go in a public PR. `gridpact/fixture.py` writes tiny made-up files with the same names and columns, so `GRIDPACT_DATA_DIR=fixtures/synthetic` is all a reviewer needs. data.py and verify.py are unchanged. Found while testing: a retried `propose` is not deduplicated (`tests/test_fixture_day.py`).
+
+## HW8: propose(request_id) makes a retried propose idempotent (2026-11-05)
+A retried `propose` used to open a second offer and accepting both double-booked the seller (found with the synthetic fixture). `propose` now takes an optional `request_id`: the same id with the same terms returns the original offer (no new offer, no ledger entry); the same id with different terms is refused; ids are per sender. Callers that pass none behave exactly as before, so the HW7 runs (tags v1, v2) are unaffected; the LLM agents were not changed and do not send one. Existing databases get the column on connect.
