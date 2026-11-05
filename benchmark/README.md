@@ -138,9 +138,9 @@ pass in both versions; liars caught 50/50; false challenges 0/160 (2/160 origina
 large n is noisy. Tables: `results/results_v1r.csv`, `results_v2r.csv`, `summary_v1r.md`, `summary_v2r.md`.
 The original v1 and v2 results are unchanged and remain the numbers the report is based on.
 
-## Report and contributions
+## Contributions
 
-The submitted PDF is `HW7_report.pdf` (written by Maheen from the files in this folder). Contributions:
+Maheen wrote the HW7 report from the files in this folder. Contributions:
 Nicolas wrote the preregistration, harness, scorer, ran the 190 v1 and 85 v2 runs and made the v2 change;
 Maheen wrote the report and, earlier, fixed the bounty accounting and added the money-conservation check and
 settlement tests (`tests/test_settle.py`) that the deterministic settlement here relies on.

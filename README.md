@@ -12,7 +12,7 @@ and an independent verifier. Status: all six phases done (`docs/PROGRESS.md`).
 
 **HW7 benchmark**: `benchmark/` holds the preregistered evaluation (claim, ablation baseline, 15 scenarios,
 stress sweep, one evidence-driven change, retest on held-out cases) with every run log. Start with
-`benchmark/README.md`; the submitted report is `benchmark/HW7_report.pdf`.
+`benchmark/README.md`.
 
 Git tags tell the two homeworks apart: `hw6` is the HW6 system as handed in (everything outside
 `benchmark/`); `v1` is HW7 before its one change to the system; `v2` is after it. `git diff hw6 v1`
