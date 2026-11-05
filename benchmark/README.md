@@ -127,6 +127,17 @@ Commands and the exact scenario lists are in `PREREGISTRATION.md` section 10. Ev
 in `results/` is regenerated from `runs/` by `score.py`, `analyze.py`, `stress.py` and `compare.py`.
 Total API spend for everything here was about $1.60 against a $15 cap.
 
+## Independent replication (v1r, v2r)
+
+On 2026-11-04 the whole benchmark was rerun from scratch with the live model: v1 from a checkout of tag
+`v1` (`runs/v1r/`, 190 runs) and v2 from the v2 code (`runs/v2r/`, 85 runs), about $1.2, no failed runs.
+Re-scoring the original logs reproduced every committed table exactly. Fresh runs: all preregistered checks
+pass in both versions; liars caught 50/50; false challenges 0/160 (2/160 originally); fraud loss -$545 vs
+-$538; v2 recall at 12 and 16 sellers 0.87 and 0.73 (0.80 and 0.67), so the blind spot reproduces. The v1
+65% delivery plateau reproduced at 6 and 8 sellers but not fully at 12 and 16 (0.69, 0.88), so its size at
+large n is noisy. Tables: `results/results_v1r.csv`, `results_v2r.csv`, `summary_v1r.md`, `summary_v2r.md`.
+The original v1 and v2 results are unchanged and remain the numbers the report is based on.
+
 ## Report and contributions
 
 The submitted PDF is `HW7_report.pdf` (written by Maheen from the files in this folder). Contributions:
