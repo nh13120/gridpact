@@ -9,6 +9,7 @@ commitment is created.
 Run it:  python -m gridpact.server        (streamable HTTP on config.PORT)
 """
 import math
+import os
 import secrets
 import socket
 import threading
@@ -297,6 +298,31 @@ def challenge(token: str, commitment_id: int, claim: str, evidence: str) -> dict
         verdict = settle.adjudicate(conn_(), c, me["agent_id"], claim, evidence)
         conn_().commit()
     return {"ok": True, **verdict}
+
+
+@mcp.tool()
+def operator_settle(operator_key: str) -> dict:
+    """Operator only. Settle every commitment that has not been settled yet against the day's real-time
+    prices (deterministic, same rules as the end-of-day settlement) and return one line per commitment.
+    Disabled unless the server was started with GRIDPACT_OPERATOR_KEY set; agents never have the key."""
+    key = os.environ.get("GRIDPACT_OPERATOR_KEY")
+    if not key:
+        return {"ok": False, "reason": "operator tools are disabled on this server"}
+    if not (isinstance(operator_key, str) and secrets.compare_digest(operator_key.encode(), key.encode())):
+        return {"ok": False, "reason": "wrong operator key"}
+    from gridpact import settle
+    with _write:
+        c = conn_()
+        day = data.load_day()
+        c.execute("INSERT OR IGNORE INTO kv VALUES ('day', ?)", (str(day.timestamp.min().tz_convert(data.TZ).date()),))
+        rows = settle.settle_day(c, day, incremental=True)
+        out = {}
+        for r in rows:
+            o = out.setdefault(r["commitment_id"], {"commitment_id": r["commitment_id"], "committed_kwh": 0.0,
+                               "delivered_kwh": 0.0, "shortfall_kwh": 0.0, "energy_usd": 0.0, "penalty_usd": 0.0, "grid_usd": 0.0})
+            for k in ("committed_kwh", "delivered_kwh", "shortfall_kwh", "energy_usd", "penalty_usd", "grid_usd"):
+                o[k] = round(o[k] + r[k], 4)
+    return {"ok": True, "settled": list(out.values())}
 
 
 # --- admin (called by the orchestrator in-process, not over MCP) -------------

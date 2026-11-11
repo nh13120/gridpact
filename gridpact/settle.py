@@ -24,17 +24,30 @@ REPUTATION_CUT = 0.5
 CHALLENGE_BOND_USD = 50.0
 
 
-def settle_day(conn, day, trust=False):
+def settle_day(conn, day, trust=False, incremental=False):
     """Settle every active commitment against `day` (output of data.load_day). Returns rows written.
 
     trust=True is the benchmark's baseline: pay the seller for what it committed, as if every claim
-    were true. No shortfall, no penalty, no grid top-up. The scorer computes the real shortfall."""
+    were true. No shortfall, no penalty, no grid top-up. The scorer computes the real shortfall.
+
+    incremental=True (HW8, used by the operator tool) settles only commitments that have no settlement
+    rows yet, starting each seller's battery pools from what earlier calls already delivered, so calling
+    it again after new trades gives the same result as one call at the end of the day."""
     price_rt = day.groupby("step").price_usd_mwh.first()
     written = []
     power_left, energy_left = {}, {}   # per (seller, step) kWh and per seller kWh, shared by all its commitments
+    if incremental:
+        for r in conn.execute("SELECT c.seller, s.step, SUM(s.delivered_kwh) AS d FROM settlements s "
+                              "JOIN commitments c USING (commitment_id) GROUP BY c.seller, s.step").fetchall():
+            sl = conn.execute("SELECT * FROM agents WHERE agent_id = ?", (r["seller"],)).fetchone()
+            power_left[(r["seller"], r["step"])] = sl["bess_power_kw"] * STEP_H - r["d"]
+            energy_left[r["seller"]] = energy_left.get(r["seller"], sl["bess_energy_kwh"]) - r["d"]
     # 'challenged' commitments still settle: a challenge adds a bounty, it does not cancel delivery duties.
     for c in conn.execute("SELECT * FROM commitments WHERE status IN ('active', 'challenged') "
                           "ORDER BY commitment_id").fetchall():
+        if incremental and conn.execute("SELECT 1 FROM settlements WHERE commitment_id = ?",
+                                        (c["commitment_id"],)).fetchone():
+            continue
         seller = conn.execute("SELECT * FROM agents WHERE agent_id = ?", (c["seller"],)).fetchone()
         sid = seller["agent_id"]
         energy_left.setdefault(sid, seller["bess_energy_kwh"])             # kWh over the whole day
