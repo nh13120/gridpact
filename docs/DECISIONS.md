@@ -56,3 +56,16 @@ A retried `propose` used to open a second offer and accepting both double-booked
 - Every MCP tool now runs under one reentrant lock, including the reads. The scale test crashed the shared SQLite
   connection with concurrent registers and with the reads that ran before the write lock. A per-agent lock or a
   connection per thread would scale further; one lock was enough for 1,500 agents (6 s), so it stays simple.
+
+## 2026-11-12: HW9 cold-start test
+- The test bed puts a logging proxy in front of each client agent so every request and response is recorded without the client's
+  help, and scores 15 checks from the database and the proxy logs, not from what a client says. Checks were committed before run 1.
+- The clients are fresh Claude subagent sessions, so the test is self-run, not independent. The auditor needs the registry file
+  (the nameplate is not returned by any tool); it was authorised to read it and used the repository's Python interpreter because
+  system Python had no parquet reader. Disclosed in the report.
+- Run 1 found that a buyer cannot see a challenge cutting its commitment (get_inbox shows only offer status). Fix: `get_commitments`.
+  Run 2 still failed the same two checks because the buyer did not re-read; the guide now says to re-read right before acting or
+  reporting. Run 3 passed 15 of 15. One run per condition: no rate is claimed.
+- Not done: a tool or field that exposes the nameplate, and push notifications to agents.
+- Real weather (Open-Meteo) explains plant solar output (r 0.82 to 0.94) but not the battery's charge at 17:00 (R2 <= 0.07), so it is
+  not used in settlement. `python -m benchmark.weather_check`; the weather cache is not committed (keyed by plant coordinates).

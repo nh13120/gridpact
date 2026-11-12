@@ -19,3 +19,5 @@ Check the phase's "done when" command before ticking it. Details in `PLAN.md`.
 
 ## What's next
 Read `benchmark/README.md`. Open question for the next iteration: a second audit after re-sourcing (recall fell at 12-16 sellers in v2). December work after that (see README "Next steps").
+
+- [x] HW9: agent guide, cold-start test (3 runs), get_commitments, boundary and regression tests, final slides and report (`coldstart/report/`)
