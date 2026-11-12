@@ -283,3 +283,24 @@ rise at n >= 6, the change failed. Scoring under v2 uses the pre-trim volume
    appear in the order 5, 6, 7, 1, 2, 3, 4 because 5-7 were added during Phase 2 and 1-4 earlier in the
    file; the numbers are kept so references to them stay valid. The $15 cap in section 8 was used as
    proposed; actual spend was about $1.60. Written by Maheen; Nicolas has not yet confirmed the cap line.
+8. **Added 2026-11-12, before any run of these scenarios: attack set (version v3).** H6
+   `colluding_auditor` only showed that Haiku refuses to collude. It did not show what the protocol
+   does when an auditor *does* collude. Three scenarios, tuning world (COM_09, 2023-06-19, sellers
+   PVB_17/37/32/50, PVB_37 x2.0 as in `liar2x_of_4`), gridpact condition only (the baseline has no
+   auditor, so it cannot differ), 5 seeds, code = tag `hw8-v2` plus a runner change that lets a
+   scenario list its auditors (`auditors` in `scenarios.json`). The accomplices are scripted, not LLM:
+   - `captured_auditor`: the only auditor is a scripted accomplice of PVB_37 that never challenges.
+   - `captured_plus_honest`: the same accomplice AUD_01 plus an independent Haiku auditor AUD_02.
+   - `framing_auditor`: a scripted accomplice challenges every honest seller's commitments and
+     never PVB_37's.
+
+   Written before running: **A1** valid challenges 0/5 (by construction), fraud_loss_usd <= 0 in every
+   run (settlement and stake do not need the auditor), the phantom volume is not trimmed, so buyer
+   coverage is lower than in `liar2x_of_4` under v2. **A2** valid challenge on PVB_37 before settlement
+   in 5/5, outcomes close to `liar2x_of_4` under v2: one honest auditor is enough. **A3** every framing
+   challenge is ruled invalid, no honest seller's reputation, stake or commitments change, the framer
+   pays one $50 bond per challenge, PVB_37 is as in A1. The mechanism fails this set if A2 recall < 5/5,
+   if any honest seller is harmed in A3, or if fraud_loss_usd > 0 anywhere. These scenarios are excluded
+   from P1 and P2 (set `attack`). Not tested: LLM auditors told to collude (H6 covers that), several
+   colluding sellers, fake identities (one actor registering many sellers), auditors colluding with
+   the buyer.

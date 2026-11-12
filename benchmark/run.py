@@ -31,6 +31,14 @@ BUDGET_CAP_USD = 15.0                # PREREGISTRATION.md section 8; the parent 
 BASE_PORT = 8800
 
 
+def auditors_of(sc):
+    """Auditors of a scenario. Default: one Haiku auditor AUD_01 (all v1/v2 scenarios). The attack scenarios (v3)
+    list their own: kind 'haiku' (an LLM agent), 'silent' (scripted accomplice that never challenges) or
+    'framing' (scripted accomplice that challenges every honest seller and never its partner)."""
+    return sc.get("auditors") or [{"id": "AUD_01", "kind": "haiku", "max_turns": sc["auditor"]["max_turns"],
+                                   "extra": sc["auditor"]["extra"]}]
+
+
 def scenarios():
     return {s["id"]: s for s in json.loads((HERE / "scenarios.json").read_text())["scenarios"]}
 
@@ -67,7 +75,8 @@ def run_one(sc, condition, seed, rundir):
             r = server.register_agent(s, "seller", flex)
             assert r["ok"], r
         if condition == "gridpact":
-            assert server.register_agent("AUD_01", "auditor")["ok"]
+            for a in auditors_of(sc):
+                assert server.register_agent(a["id"], "auditor")["ok"]
         server._conn.close(); server._conn = None
 
         def q(sql, *a):
@@ -110,12 +119,21 @@ def run_one(sc, condition, seed, rundir):
         # --- audit BEFORE settlement (gridpact only) ---------------------------------------------
         if condition == "gridpact":
             nameplates = ", ".join(f"{s} {meta.loc[s].bess_power_kw:.0f} kW" for s in sellers)
-            task = (f"You are AUD_01, token {token('AUD_01')}. Public registry, battery nameplate power: "
-                    f"{nameplates}. Read the ledger. For each seller, compare declared_flex_kw in its register "
-                    f"entry with its nameplate. Challenge each commitment of any seller whose declared envelope "
-                    f"exceeds its nameplate (claim 'envelope exceeds nameplate', evidence with both numbers). "
-                    f"Do not challenge the others.{sc['auditor']['extra']}")
-            run_agent.run("AUD_01", "auditor.md", task, max_turns=sc["auditor"]["max_turns"])
+            for a in auditors_of(sc):
+                if a["kind"] == "haiku":
+                    task = (f"You are {a['id']}, token {token(a['id'])}. Public registry, battery nameplate power: "
+                            f"{nameplates}. Read the ledger. For each seller, compare declared_flex_kw in its register "
+                            f"entry with its nameplate. Challenge each commitment of any seller whose declared envelope "
+                            f"exceeds its nameplate (claim 'envelope exceeds nameplate', evidence with both numbers). "
+                            f"Do not challenge the others.{a.get('extra', '')}")
+                    run_agent.run(a["id"], "auditor.md", task, max_turns=a["max_turns"])
+                elif a["kind"] == "framing":      # scripted accomplice: frames every honest seller, spares the liars
+                    for cm in q("SELECT commitment_id, seller FROM commitments ORDER BY commitment_id"):
+                        if sellers[cm["seller"]] == 1.0:
+                            server.challenge(token(a["id"]), cm["commitment_id"], "envelope exceeds nameplate",
+                                             f"framing: {cm['seller']} accused without evidence")
+                    server._conn.close(); server._conn = None
+                # kind 'silent': the accomplice never files anything
 
         # --- v2: re-source the volume a valid challenge released (one extra round) ---------------
         resource_round = None
@@ -169,6 +187,7 @@ def run_one(sc, condition, seed, rundir):
         "run_id": rundir.name, "version": rundir.parent.name, "condition": condition, "scenario": sc["id"],
         "set": sc["set"], "type": sc["type"], "seed": seed, "model": MODEL, "day": sc["day"],
         "window": [STEP_FROM, STEP_TO], "max_turns": 8, "auditor_max_turns": sc["auditor"]["max_turns"],
+        "auditors": [{"id": a["id"], "kind": a["kind"]} for a in auditors_of(sc)],
         "ground_truth": {s: {"factor": f, "true_power_kw": float(meta.loc[s].bess_power_kw),
                              "true_energy_kwh": float(meta.loc[s].bess_energy_kwh)} for s, f in sellers.items()},
         "buyers": buyers, "dropouts": sorted(dropouts), "need_kwh_per_step": need,

@@ -157,3 +157,47 @@ settlement tests (`tests/test_settle.py`) that the deterministic settlement here
 | `stress.py` | the sweep table, hypothesis checks and plot |
 | `compare.py` | before/after v1 vs v2, tuning and held-out separately |
 | `runs/<version>/<run>/` | `transcript.jsonl` (every tool call and result) and `run.json` (ground truth, all tables, cost, tokens, time) |
+
+## Attack set: a colluding auditor (`results/attacks_v3.md`, amendment 8 in the preregistration)
+
+H6 only showed that Haiku refuses to collude. v3 asks what the protocol does when an auditor does collude, with
+scripted accomplices of the liar PVB_37 (5 seeds each, same world as `liar2x_of_4`):
+
+| scenario | liar caught before settlement | buyer fraud loss (max) | liar gain (mean) | honest sellers harmed | framer's bonds |
+|---|---|---|---|---|---|
+| `captured_auditor` (only auditor stays silent) | 0/5 | -$504 | -$512 | 0 | none |
+| `captured_plus_honest` (plus one independent Haiku auditor) | 5/5 | $0 | -$101 | 0 | none |
+| `framing_auditor` (challenges every honest seller, spares the liar) | 0/5 | -$504 | -$504 | 0 | $150 (3 x $50) |
+| same world, honest auditor, v2 (reference) | 5/5 | $0 | -$101 | n/a | n/a |
+
+- A captured auditor does not break the money guarantees: settlement and the stake do not need it, so the buyer
+  is still refunded and lying still loses money (more than with a working auditor, because the phantom commitments
+  stay and fail).
+- What a captured auditor does remove is the v2 repair: no challenge means no trim, no reputation cut, no cap reset.
+- One independent honest auditor restores everything (5/5, the same numbers as the honest-auditor reference).
+- Framing fails by design: the server rules each challenge against the public nameplate, so all 15 framing
+  challenges were invalid, no honest seller lost reputation, stake or volume, and the framer paid $50 each.
+- A prediction that missed: I wrote that buyer coverage would be lower under a captured auditor than under v2.
+  It is identical (0.65 of need), because with 4 sellers there is nobody left to re-source from. The effect
+  shows up in money and in the liar's reputation, not in energy.
+- Not tested: an LLM auditor told to collude (H6), several colluding sellers, one actor registering many sellers,
+  auditors colluding with the buyer. 15 runs, $0.05.
+
+## Scale: hundreds of agents (`python -m benchmark.scale`, no LLM)
+
+Scripted agents on a synthetic registry, all acting from a thread pool: register, trade, over-declare 20% of the
+sellers, challenge, settle.
+
+| agents | trades | liars caught | whole day | ledger intact |
+|---|---|---|---|---|
+| 32 | 30 | 6/6 | 0.1 s | yes |
+| 310 | 300 | 58/58 | 1.0 s | yes |
+| 1,520 | 1,500 | 278/278 | 5.9 s | yes |
+
+Per call, at 1,520 agents: propose 26 ms (p50), 72 ms (p95); register 57 ms. The test found a real bug: with
+many agents at once, registration (and the reads that run before the write lock) shared one SQLite connection
+across threads and crashed. Every tool now runs under the lock (`tests/test_scale.py` fails without it).
+The real ENGIE registry has only 80 agents, so a hundreds-scale run needs the synthetic one.
+This measures the server, not the models. With Haiku agents the cost is the turns: about 5.4 s and $0.001 per
+turn (measured, v2), and a day for 300 agents is roughly 700 to 900 turns. The runner is sequential, so that is
+over an hour one after another, or minutes with 20 agents in parallel and enough API rate limit. Not measured.

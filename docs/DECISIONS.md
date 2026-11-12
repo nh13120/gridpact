@@ -48,3 +48,11 @@ The ENGIE parquet files are sponsor data (136 MB) and cannot go in a public PR. 
 
 ## HW8: propose(request_id) makes a retried propose idempotent (2026-11-05)
 A retried `propose` used to open a second offer and accepting both double-booked the seller (found with the synthetic fixture). `propose` now takes an optional `request_id`: the same id with the same terms returns the original offer (no new offer, no ledger entry); the same id with different terms is refused; ids are per sender. Callers that pass none behave exactly as before, so the HW7 runs (tags v1, v2) are unaffected; the LLM agents were not changed and do not send one. Existing databases get the column on connect.
+
+## 2026-11-12: attack set and scale test
+- Captured and framing auditors are scripted, not LLM, because Haiku refused to collude in H6; the question is what the
+  protocol does when collusion works. Preregistered as amendment 8 before the runs; one prediction (coverage) missed and
+  is reported as missed.
+- Every MCP tool now runs under one reentrant lock, including the reads. The scale test crashed the shared SQLite
+  connection with concurrent registers and with the reads that ran before the write lock. A per-agent lock or a
+  connection per thread would scale further; one lock was enough for 1,500 agents (6 s), so it stays simple.

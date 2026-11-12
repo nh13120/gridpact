@@ -12,6 +12,7 @@ import math
 import os
 import secrets
 import socket
+import functools
 import threading
 import subprocess
 import sys
@@ -26,7 +27,17 @@ mcp = MCPServer("gridpact")
 _conn = None
 # ponytail: one global lock around every write tool. MCP runs tools in worker threads, so
 # without it two accepts could both pass the cap check. Per-seller locks if throughput matters.
-_write = threading.Lock()
+_write = threading.RLock()
+
+
+def _locked(fn):
+    """Run a tool under the write lock. The single SQLite connection is shared by all worker threads, so even
+    registration (which appends to the ledger) and the read tools must not run at the same time as a write."""
+    @functools.wraps(fn)
+    def run(*a, **k):
+        with _write:
+            return fn(*a, **k)
+    return run
 
 
 def _finite(*xs):
@@ -81,6 +92,7 @@ def _log(agent_id, action, payload):
 # --- tools -------------------------------------------------------------------
 
 @mcp.tool()
+@_locked
 def register_agent(agent_id: str, role: str, declared_flex_kw: float | None = None) -> dict:
     """Join GridPact as an ENGIE agent. role is buyer, seller or auditor.
     Sellers may declare the flexibility (kW) they can deliver on top of their baseline;
@@ -115,6 +127,7 @@ def register_agent(agent_id: str, role: str, declared_flex_kw: float | None = No
 
 
 @mcp.tool()
+@_locked
 def find_counterparties(token: str) -> dict:
     """List agents you could trade with (buyers see sellers, sellers see buyers),
     with their reputation (1.0 = clean) and trade cap in kWh per 15-min step."""
@@ -131,6 +144,7 @@ def find_counterparties(token: str) -> dict:
 
 
 @mcp.tool()
+@_locked
 def propose(token: str, to: str, step_from: int, step_to: int, kwh_per_step: float,
             price_usd_mwh: float, penalty_usd_mwh: float, request_id: str | None = None) -> dict:
     """Offer a trade: `kwh_per_step` delivered in every 15-min step from step_from to
@@ -185,6 +199,7 @@ def _propose_locked(me, seller, to, step_from, step_to, kwh_per_step, price_usd_
 
 
 @mcp.tool()
+@_locked
 def respond(token: str, offer_id: int, action: str, counter_price_usd_mwh: float | None = None) -> dict:
     """Answer an offer addressed to you. action = accept | reject | counter.
     accept creates a commitment and locks the seller's stake (penalty x total kWh).
@@ -256,6 +271,7 @@ def _respond_locked(me, offer_id, action, counter_price_usd_mwh):
 
 
 @mcp.tool()
+@_locked
 def get_inbox(token: str) -> dict:
     """Open offers waiting for your answer, and the status of offers you sent."""
     me = _agent(token)
@@ -270,6 +286,7 @@ def get_inbox(token: str) -> dict:
 
 
 @mcp.tool()
+@_locked
 def get_ledger(token: str, since_seq: int = 0, limit: int = 100) -> dict:
     """Public ledger: every registration, offer, commitment, settlement and challenge,
     oldest first. Pass since_seq to page."""
@@ -280,6 +297,7 @@ def get_ledger(token: str, since_seq: int = 0, limit: int = 100) -> dict:
 
 
 @mcp.tool()
+@_locked
 def challenge(token: str, commitment_id: int, claim: str, evidence: str) -> dict:
     """Auditors only. Contest a commitment, e.g. claim="envelope exceeds nameplate",
     evidence="declared 4870 kW vs 2435 kW battery". The server adjudicates
@@ -301,6 +319,7 @@ def challenge(token: str, commitment_id: int, claim: str, evidence: str) -> dict
 
 
 @mcp.tool()
+@_locked
 def operator_settle(operator_key: str) -> dict:
     """Operator only. Settle every commitment that has not been settled yet against the day's real-time
     prices (deterministic, same rules as the end-of-day settlement) and return one line per commitment.
