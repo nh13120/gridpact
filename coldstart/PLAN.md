@@ -69,3 +69,19 @@ The clients are fresh Claude sessions started by the author through a subagent m
 so this is a **self-run** test, not an independent one. The clients share a working directory with the repository;
 they are told to read only the guide, and their reports list the files they read. The author wrote the guide and the
 test bed. Manual help: none during the run; any intervention will be listed here.
+
+## Run 1 result, and the rerun (written after run 1, before run 2)
+
+Run 1 (`coldstart/runs/run1`): 13 of 15 checks passed. B3 and B7 failed. The auditor's valid challenge cut `PVB_37`'s
+commitment from 1,250 to 625 kWh/step at 16 s; the buyer then polled at 42 s, saw only "accepted" in `get_inbox`, and
+reported 18,000 kWh / $900 while the database held 10,500 kWh / $525. The interface gave the buyer no way to see a
+commitment's current volume. Classified: **interface limitation** (not test setup, not client error).
+
+Improvement: new tool `get_commitments`, plus guide changes for the gaps the clients listed (inbox fields, ledger action
+names, registration-before-proposal, inclusive steps, reading the registry file, what to do after a challenge).
+Regression test: `tests/test_get_commitments.py`.
+
+Rerun (`run2`): three new fresh clients, the same task texts and the same checks, same launch order. Expected, written
+now: B7 passes if the buyer reads `get_commitments` before it finishes; B3 passes only if the buyer also re-sources the
+cut volume from `PVB_17` in time; and the outcome can still fail if the challenge lands after the buyer has finished
+(a timing race the tool cannot remove). Each of those is reported as observed.

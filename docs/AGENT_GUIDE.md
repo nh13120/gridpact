@@ -43,16 +43,17 @@ Every tool returns a JSON object with `"ok": true` or `"ok": false, "reason": ".
 ## 3. Tools
 
 Time is a day of 96 steps of 15 minutes, numbered 0 to 95 in local time. Step 68 is 17:00; steps 68 to 79
-cover 17:00 to 19:45. Energy is in kWh per step; prices are in $/MWh.
+cover 17:00 to 19:45 (`step_to` is inclusive: 12 steps). Steps outside 0 to 95 are refused with a reason and nothing is created. Energy is in kWh per step; prices are in $/MWh.
 
 | Tool | Inputs | Returns | Notes |
 |---|---|---|---|
 | `register_agent` | `agent_id`, `role` (`buyer`/`seller`/`auditor`), optional `declared_flex_kw` (sellers) | `token` (secret), your public profile, `trade_cap_kwh` | Call once per ID. The token is shown **only once**; keep it. Buyers and sellers must use an ID from the registry, with the matching role. `declared_flex_kw` is what you claim you can deliver; your cap per step is that many kW x 0.25 h, rounded down. Omit it to use the registry value. |
-| `find_counterparties` | `token` | list of agents of the opposite role with `declared_flex_kw`, `reputation`, `trade_cap_kwh` | Buyers see sellers and sellers see buyers. Auditors cannot use it. |
+| `find_counterparties` | `token` | list of agents of the opposite role with `declared_flex_kw`, `reputation`, `trade_cap_kwh` | Buyers see sellers and sellers see buyers. Auditors cannot use it. It lists only agents **registered at that moment**; you can only propose to a registered seller (otherwise: `"<id> is not registered"`), and sellers may join later, so call it again. |
 | `propose` | `token`, `to`, `step_from`, `step_to`, `kwh_per_step`, `price_usd_mwh`, `penalty_usd_mwh`, optional `request_id` | `offer_id` | A trade is exactly one buyer and one seller. `penalty_usd_mwh` is what the seller pays per MWh it fails to deliver. Refused if the seller lacks cap for that window. **If you may retry (timeout, lost reply), pass the same `request_id` each time**: a repeat with identical terms returns the original offer; the same id with different terms is refused. |
-| `get_inbox` | `token` | `incoming` (open offers waiting for your answer), `sent` (your last 10 offers and their status) | Poll this; there are no push notifications. |
+| `get_inbox` | `token` | `incoming` (open offers waiting for your answer), `sent` (your last 10 offers and their status) | Poll this; there are no push notifications. Offer fields: `offer_id, from_agent, to_agent, step_from, step_to, kwh_per_step, price_usd_mwh, penalty_usd_mwh, status` (`open`, `accepted`, `rejected`), `round_opened`, `request_id`. It tells you whether an offer was accepted, **not** what you now hold: use `get_commitments` for that. |
 | `respond` | `token`, `offer_id`, `action` (`accept`/`reject`/`counter`), `counter_price_usd_mwh` for counters | on accept: `commitment_id`, `stake_usd` | Only the addressee can answer. Accepting locks the seller's stake: `penalty x kWh/step x steps / 1000` dollars. A counter rejects the offer and opens a new one back to the sender. |
-| `get_ledger` | `token`, optional `since_seq`, `limit` (default 100) | `entries`, oldest first | Every registration, offer, commitment, challenge and settlement, hash-chained. If the ledger has more than `limit` entries, page with `since_seq`. |
+| `get_commitments` | `token` | `commitments`: for each, `commitment_id, seller, buyer, step_from, step_to, kwh_per_step` (the **current** volume), `trimmed_from_kwh` (the original volume if a valid challenge cut it, else null), `price_usd_mwh, penalty_usd_mwh, stake_usd, status` (`active`/`challenged`) | Buyers and sellers see their own; auditors see all. Check it after any challenge: if a commitment was cut, you now hold less than you agreed and can look for replacement energy. |
+| `get_ledger` | `token`, optional `since_seq`, `limit` (default 100) | `entries`, oldest first | every registration, offer, commitment, challenge and settlement, hash-chained. Actions: `register` (its payload shows the agent's `declared_flex_kw`), `propose`, `counter`, `reject`, `commit`, `trim` (a commitment was cut), `challenge`, `settle`. If the ledger has more than `limit` entries, page with `since_seq`. |
 | `challenge` | `token` (auditors only), `commitment_id`, `claim`, `evidence` | `verdict` `valid`/`invalid`/`duplicate`, `bounty_usd` | See section 4. |
 
 Agents cannot settle. Settlement runs when the operator closes the day. Once it has, each commitment shows
@@ -66,11 +67,15 @@ delivered vs committed kWh and any penalty in the ledger.
   step (and total energy over the day). The buyer buys any shortfall from the grid.
 - **Auditing.** A challenge is ruled by the server, not by judgement: it is `valid` only if the seller's declared
   capacity exceeds its registry nameplate battery power by more than 10%. The nameplate is public, in the ENGIE
-  registry file `agents_metadata.parquet` (column `bess_power_kw`); GridPact tools do not return it.
+  registry file `agents_metadata.parquet` (column `bess_power_kw`); GridPact tools do not return it, so you need
+  read access to that file and a way to read parquet (Python with pyarrow, or ask your operator for the number).
   A valid challenge pays you a bounty of 10% of that commitment's stake (taken from the seller), cuts the
   seller's reputation by 0.5, resets its cap to its real one and trims its not-yet-settled commitments to that
   cap. An invalid challenge costs you a $50 bond. One valid challenge per commitment.
 - **Tokens.** Your token is your identity. Do not share it. Wrong or missing tokens are refused.
+- **After a challenge.** A challenge cuts the liar's commitment to its real cap and releases the volume, so a buyer may
+  hold less than it agreed. Nothing is pushed to you: call `get_commitments` and, if needed, propose the missing volume
+  to another seller.
 - **What GridPact does not do.** No cancel or withdraw of an offer. Offers only expire if the operator advances
   negotiation rounds. No area filter: every seller is listed. One simulated day. Identity is a token, not a signature.
 

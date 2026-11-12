@@ -287,6 +287,25 @@ def get_inbox(token: str) -> dict:
 
 @mcp.tool()
 @_locked
+def get_commitments(token: str) -> dict:
+    """Your commitments: the deals that were accepted, with their CURRENT volume. A buyer or seller sees the ones it
+    is party to; an auditor sees all of them. `kwh_per_step` is what is now owed; if a valid challenge cut it,
+    `trimmed_from_kwh` holds the original volume (otherwise null) and `status` is `challenged`. Use this, not
+    get_inbox (which only shows offer status), to know what you really hold and when to find replacement energy."""
+    me = _agent(token)
+    if not me:
+        return {"ok": False, "reason": "unknown token"}
+    cols = "commitment_id, offer_id, seller, buyer, step_from, step_to, kwh_per_step, trimmed_from_kwh, price_usd_mwh, penalty_usd_mwh, stake_usd, status"
+    if me["role"] == "auditor":
+        rows = conn_().execute(f"SELECT {cols} FROM commitments ORDER BY commitment_id").fetchall()
+    else:
+        rows = conn_().execute(f"SELECT {cols} FROM commitments WHERE seller = ? OR buyer = ? ORDER BY commitment_id",
+                               (me["agent_id"], me["agent_id"])).fetchall()
+    return {"ok": True, "commitments": [dict(r) for r in rows]}
+
+
+@mcp.tool()
+@_locked
 def get_ledger(token: str, since_seq: int = 0, limit: int = 100) -> dict:
     """Public ledger: every registration, offer, commitment, settlement and challenge,
     oldest first. Pass since_seq to page."""
