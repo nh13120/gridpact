@@ -46,7 +46,7 @@ function node(key, label, t0, o = {}) {
 
 function caption(t) {
   const caps = [[3.4, 9, 'AI agents will trade grid power.'], [9, 14, 'Every promise is backed by a deposit.'],
-                [14, 20, 'An auditor checks the claim against the public spec.'], [20, 25, 'Plain code settles. No AI.']];
+                [14, 20, 'An auditor checks the claim against the public spec.'], [20, 23.5, 'Plain code settles. No AI.']];
   let s = '';
   for (const [a, b, txt] of caps) { const o = win(t, a, b, .5); if (o > 0) s += T(80, 668, txt, { size: 34, w: 300, op: o }); }
   return s;
@@ -70,7 +70,7 @@ function draw(t) {
   }
 
   // scenes 2 to 5: the market
-  const mk = win(t, 3.4, 25.2, .5);
+  const mk = win(t, 3.4, 23.9, .5);
   if (mk > 0) {
     s += `<g opacity="${mk}">`;
     const chk0 = win(t, 14.2, 19.6, .5);
@@ -125,7 +125,7 @@ function draw(t) {
     }
 
     // scene 5: settlement (20 to 25)
-    const set = win(t, 20.2, 25, .4);
+    const set = win(t, 20.2, 23.6, .4);
     if (set > 0) {
       for (const [k, n, col] of [['A', 6, GREEN], ['B', 3, GREEN]]) {
         for (let i = 0; i < n; i++) {
@@ -136,29 +136,40 @@ function draw(t) {
       s += T(POS.buyer[0], POS.buyer[1] - 70, 'made whole', { size: 20, w: 600, fill: GREEN, anchor: 'middle', op: set });
       // the ledger chain
       for (let i = 0; i < 6; i++) {
-        const o = p(t, 21.2 + i * .35, 21.7 + i * .35), x = 640 + i * 96;
+        const o = p(t, 20.9 + i * .25, 21.3 + i * .25), x = 640 + i * 96;
         s += R(x, 612, 64, 30, { stroke: INK, sw: 2, op: o }) + T(x + 32, 633, '#' + (i + 1), { size: 14, w: 600, anchor: 'middle', op: o });
         if (i) s += L(x - 32, 627, x, 627, { stroke: INK, sw: 2, op: o });
       }
-      s += T(1215, 598, 'hash-chained ledger', { size: 13, fill: MID, anchor: 'end', op: p(t, 22.8, 23.4) * set });
+      s += T(1215, 598, 'hash-chained ledger', { size: 13, fill: MID, anchor: 'end', op: p(t, 22.4, 22.9) * set });
     }
     s += '</g>';
   }
   s += caption(t);
 
-  // scene 6: evidence and end card (25 to 30)
-  const ev = p(t, 25, 25.8);
+  // scene 6 (23.7 to 27.4): did it work?  scene 7 (27.4 to 30): the vision and where to find it
+  const ev = p(t, 23.7, 24.3), evOut = p(t, 27.1, 27.7);
   if (ev > 0) {
     s += R(0, 0, W, H, { fill: PAPER, rx: 0, op: ev });
-    s += T(80, 52, 'GRIDPACT  ·  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: ev }) + L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: ev });
-    const nums = [['50/50', 'liars caught before settlement'], ['90%', 'of the buyer’s need delivered, up from 65%'], ['1,520', 'agents in one day, in 6 seconds']];
-    nums.forEach(([big, cap], i) => {
-      const o = p(t, 25.4 + i * .5, 26.2 + i * .5), x = 80 + i * 400;
-      s += T(x, 300 + (1 - o) * 24, big, { size: 128, w: 700, fill: GREEN, font: NUM, op: o }) + T(x + 4, 350, cap, { size: 20, fill: INK, op: o });
+    s += T(80, 52, 'GRIDPACT  \u00b7  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: ev }) + L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: ev });
+    const eo = ev * (1 - evOut);
+    s += T(80, 150, 'DOES IT WORK?  IN OUR TESTS, YES.', { size: 15, w: 600, fill: GREEN, ls: 2.4, op: eo });
+    const nums = [['50/50', 'lying sellers caught', 'before they could cheat'],
+                  ['90%', 'of the buyer\u2019s energy delivered', 'up from 65% before our fix'],
+                  ['1,520', 'agents on one server', 'a full trading day in 6 seconds']];
+    nums.forEach(([big, c1, c2], i) => {
+      const o = p(t, 24.1 + i * .45, 24.8 + i * .45) * (1 - evOut), x = 80 + i * 400;
+      s += T(x, 330 + (1 - o) * 20, big, { size: 118, w: 700, fill: GREEN, font: NUM, op: o });
+      s += T(x + 4, 392, c1, { size: 26, w: 600, op: o }) + T(x + 4, 428, c2, { size: 22, fill: MID, op: o });
     });
-    const end = p(t, 27.6, 28.4);
-    s += T(80, 500, 'GridPact', { size: 64, w: 300, op: end }) + T(84, 548, 'A referee for AI agents that trade energy.', { size: 26, fill: MID, op: end });
-    s += T(84, 600, 'github.com/nh13120/gridpact   ·   Nicolas Hong, Maheen Rassell', { size: 18, w: 600, op: p(t, 28.2, 28.8) });
+    const end = p(t, 27.4, 28.1);
+    if (end > 0) {
+      s += R(0, 80, W, H - 90, { fill: PAPER, rx: 0, op: end });
+      s += T(80, 300, 'GridPact', { size: 120, w: 300, op: end });
+      s += T(84, 372, 'The referee for AI agents that trade energy.', { size: 34, fill: MID, op: end });
+      s += R(84, 404, 70 * p(t, 27.8, 28.4), 4, { fill: GREEN, rx: 0, op: end });
+      s += T(84, 470, 'Next: a pilot with one ENGIE community, no money moving.', { size: 28, w: 600, op: p(t, 28.2, 28.8) });
+      s += T(84, 560, 'github.com/nh13120/gridpact   \u00b7   Nicolas Hong, Maheen Rassell', { size: 20, w: 600, fill: MID, op: p(t, 28.6, 29.2) });
+    }
     s += R(0, 712, W * clamp(t / DUR), 8, { fill: GREEN, rx: 0 });
   }
   document.getElementById('svg').innerHTML = s;
