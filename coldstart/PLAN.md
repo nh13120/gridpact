@@ -85,3 +85,17 @@ Rerun (`run2`): three new fresh clients, the same task texts and the same checks
 now: B7 passes if the buyer reads `get_commitments` before it finishes; B3 passes only if the buyer also re-sources the
 cut volume from `PVB_17` in time; and the outcome can still fail if the challenge lands after the buyer has finished
 (a timing race the tool cannot remove). Each of those is reported as observed.
+
+## Run 2 result, and run 3 (written after run 2, before run 3)
+
+Run 2 (`coldstart/runs/run2`, new fresh clients, the guide with `get_commitments`): again 13 of 15; B3 and B7 failed. The
+buyer called `get_commitments` once at 46 s (untrimmed), the auditor's valid challenge landed at 107 s, and the buyer
+kept polling `find_counterparties` until 352 s without re-reading its commitments, then reported 18,000 kWh / $990 against
+10,500 kWh / $577.50 in the database. The tool worked; the buyer did not use it again. Classified: **client behaviour on
+an interface that pushes nothing**, with a **documentation gap** (the guide said to check after a challenge, but a buyer
+cannot know a challenge happened).
+
+Change: the guide now says plainly that a position can change until settlement and must be re-read right before acting or
+reporting. Run 3: three new fresh clients, same tasks, same checks. Written now: B7 should pass if the buyer re-reads before
+it reports; B3 passes only if it also re-sources 625 kWh/step from `PVB_17`. Not expected to be fully deterministic: the
+auditor's timing varies between runs, and a buyer that finishes before the challenge will still report a stale position.

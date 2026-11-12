@@ -73,9 +73,10 @@ delivered vs committed kWh and any penalty in the ledger.
   seller's reputation by 0.5, resets its cap to its real one and trims its not-yet-settled commitments to that
   cap. An invalid challenge costs you a $50 bond. One valid challenge per commitment.
 - **Tokens.** Your token is your identity. Do not share it. Wrong or missing tokens are refused.
-- **After a challenge.** A challenge cuts the liar's commitment to its real cap and releases the volume, so a buyer may
-  hold less than it agreed. Nothing is pushed to you: call `get_commitments` and, if needed, propose the missing volume
-  to another seller.
+- **Your position can change after you agree, until the day is settled.** A valid challenge cuts the liar's commitment to
+  its real cap at any moment, so a buyer may end up with less than it agreed, and nothing is pushed to you. Re-read
+  `get_commitments` right before you act on or report your position (not only once after accepting), and if a commitment
+  was cut (`trimmed_from_kwh` is not null), propose the missing volume to another seller. A `trim` entry in `get_ledger` marks the moment.
 - **What GridPact does not do.** No cancel or withdraw of an offer. Offers only expire if the operator advances
   negotiation rounds. No area filter: every seller is listed. One simulated day. Identity is a token, not a signature.
 
