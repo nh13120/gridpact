@@ -45,32 +45,26 @@ function node(key, label, t0, o = {}) {
 }
 
 function caption(t) {
-  const caps = [[3.4, 9, 'AI agents will trade grid power.'], [9, 14, 'Every promise is backed by a deposit.'],
+  const caps = [[3.4, 9, 'One seller is exaggerating its battery.'], [9, 14, 'Every promise is backed by a deposit.'],
                 [14, 20, 'An auditor checks the claim against the public spec.'], [20, 23.5, 'Plain code settles. No AI.']];
   let s = '';
   for (const [a, b, txt] of caps) { const o = win(t, a, b, .5); if (o > 0) s += T(80, 668, txt, { size: 34, w: 300, op: o }); }
   return s;
 }
 
-function draw(t) {
+// real time -> market time u: the setup runs fast (slides already explain the idea), the mechanism gets the room
+const warp = r => r < 4.5 ? 3.4 + r * (5.6 / 4.5) : r < 22.8 ? 9 + (r - 4.5) * (14.6 / 18.3) : 23.6 + (r - 22.8);
+function draw(real) {
+  const t = warp(real);
   window.__t = t;
   let s = R(0, 0, W, H, { fill: PAPER, rx: 0 });
   // chrome: label strip and progress bar
-  s += T(80, 52, 'GRIDPACT  ·  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: t > 3 ? 1 : 0 });
-  s += L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: t > 3 ? 1 : 0 });
-  s += R(0, 712, W * clamp(t / DUR), 8, { fill: GREEN, rx: 0 });
-
-  // scene 1: title (0 to 4)
-  const s1 = win(t, 0, 3.7, .5) * (t < .3 ? clamp(t / .3) : 1);
-  if (s1 > 0) {
-    const reveal = 'GridPact'.slice(0, Math.max(0, Math.floor(mix(0, 9, clamp(t / 1.2)))));
-    s += T(100, 330, reveal, { size: 150, w: 300, op: s1 });
-    s += T(104, 400, 'Who checks a machine’s promise?', { size: 38, fill: MID, op: s1 * clamp((t - 1.3) / .6) });
-    s += R(104, 430, 70 * clamp((t - 1.9) / .6), 4, { fill: GREEN, rx: 0, op: s1 });
-  }
+  s += T(80, 52, 'GRIDPACT  ·  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: 1 });
+  s += L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: 1 });
+  s += R(0, 712, W * clamp(real / DUR), 8, { fill: GREEN, rx: 0 });
 
   // scenes 2 to 5: the market
-  const mk = win(t, 3.4, 23.9, .5);
+  const mk = win(t, 2.9, 23.9, .5);
   if (mk > 0) {
     s += `<g opacity="${mk}">`;
     const chk0 = win(t, 14.2, 19.6, .5);
@@ -146,31 +140,31 @@ function draw(t) {
   }
   s += caption(t);
 
-  // scene 6 (23.7 to 27.4): did it work?  scene 7 (27.4 to 30): the vision and where to find it
-  const ev = p(t, 23.7, 24.3), evOut = p(t, 27.1, 27.7);
+  // scene 6 (22.9 to 27): did it work, one number.  scene 7 (27 to 30): the ask
+  const ev = p(real, 22.9, 23.5), evOut = p(real, 26.7, 27.3);
   if (ev > 0) {
     s += R(0, 0, W, H, { fill: PAPER, rx: 0, op: ev });
     s += T(80, 52, 'GRIDPACT  \u00b7  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: ev }) + L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: ev });
     const eo = ev * (1 - evOut);
     s += T(80, 150, 'DOES IT WORK?  IN OUR TESTS, YES.', { size: 15, w: 600, fill: GREEN, ls: 2.4, op: eo });
-    const nums = [['50/50', 'lying sellers caught', 'before they could cheat'],
-                  ['90%', 'of the buyer\u2019s energy delivered', 'up from 65% before our fix'],
-                  ['1,520', 'agents on one server', 'a full trading day in 6 seconds']];
-    nums.forEach(([big, c1, c2], i) => {
-      const o = p(t, 24.1 + i * .45, 24.8 + i * .45) * (1 - evOut), x = 80 + i * 400;
-      s += T(x, 330 + (1 - o) * 20, big, { size: 118, w: 700, fill: GREEN, font: NUM, op: o });
-      s += T(x + 4, 392, c1, { size: 26, w: 600, op: o }) + T(x + 4, 428, c2, { size: 22, fill: MID, op: o });
-    });
-    const end = p(t, 27.4, 28.1);
+    const o1 = p(real, 23.3, 24) * (1 - evOut), o2 = p(real, 24.4, 25.1) * (1 - evOut);
+    s += T(80, 240, 'BEFORE OUR FIX', { size: 15, w: 600, fill: MID, ls: 2.4, op: o1 });
+    s += T(80, 400, '65%', { size: 190, w: 700, fill: MID, font: NUM, op: o1 });
+    s += T(84, 450, 'of the buyer\u2019s energy delivered', { size: 26, fill: MID, op: o1 });
+    s += T(660, 240, 'AFTER', { size: 15, w: 600, fill: GREEN, ls: 2.4, op: o2 });
+    s += T(660, 400, '90%', { size: 190, w: 700, fill: GREEN, font: NUM, op: o2 });
+    s += T(664, 450, 'of the buyer\u2019s energy delivered', { size: 26, w: 600, op: o2 });
+    s += T(80, 560, 'Simulated trading day, 6 sellers, one of them lying. The auditor now cuts the liar\u2019s promise, and the energy goes back to the market.', { size: 20, fill: MID, op: p(real, 25.2, 25.9) * (1 - evOut) });
+    const end = p(real, 27, 27.6);
     if (end > 0) {
       s += R(0, 80, W, H - 90, { fill: PAPER, rx: 0, op: end });
-      s += T(80, 300, 'GridPact', { size: 120, w: 300, op: end });
-      s += T(84, 372, 'The referee for AI agents that trade energy.', { size: 34, fill: MID, op: end });
-      s += R(84, 404, 70 * p(t, 27.8, 28.4), 4, { fill: GREEN, rx: 0, op: end });
-      s += T(84, 470, 'Next: a pilot with one ENGIE community, no money moving.', { size: 28, w: 600, op: p(t, 28.2, 28.8) });
-      s += T(84, 560, 'github.com/nh13120/gridpact   \u00b7   Nicolas Hong, Maheen Rassell', { size: 20, w: 600, fill: MID, op: p(t, 28.6, 29.2) });
+      s += T(80, 300, 'Next: a pilot with one ENGIE community.', { size: 54, w: 600, op: end });
+      s += T(84, 360, 'No money moving. Real agents, real data, a referee in the loop.', { size: 28, fill: MID, op: p(real, 27.4, 28) });
+      s += R(84, 400, 70 * p(real, 27.6, 28.2), 4, { fill: GREEN, rx: 0, op: end });
+      s += T(84, 480, 'GridPact', { size: 40, w: 600, op: p(real, 28, 28.6) });
+      s += T(84, 560, 'github.com/nh13120/gridpact   \u00b7   Nicolas Hong, Maheen Rassell', { size: 20, w: 600, fill: MID, op: p(real, 28.4, 29) });
     }
-    s += R(0, 712, W * clamp(t / DUR), 8, { fill: GREEN, rx: 0 });
+    s += R(0, 712, W * clamp(real / DUR), 8, { fill: GREEN, rx: 0 });
   }
   document.getElementById('svg').innerHTML = s;
 }
