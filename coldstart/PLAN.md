@@ -114,3 +114,10 @@ New check **B8**: a refusal containing "steps must satisfy" on a registered sell
 edited; they were scored without B8. Expected, written now: B7 passes whenever the buyer makes any call after the challenge; B8 passes
 if the buyer attempts (b). The auditor's timing still varies, so a buyer that finishes before the challenge reports a position that was
 correct when it finished.
+
+## Run 4 result (appended after the run)
+
+16 of 16 checks (the 15 plus B8). The auditor's valid challenge cut `PVB_37` from 750 to 625 kWh/step; the buyer's next call returned
+a notice saying so, it bought the missing 125 kWh/step from `PVB_17`, re-read `get_commitments` and reported 18,000 kWh / $990, which
+matches the database. Its range probe reached "steps must satisfy 0 <= step_from <= step_to < 96" on the registered `PVB_37`, nothing
+created. Runs 1 to 3 were scored without B8 and are unchanged. Test bed stopped after every offer to the seller had been answered.

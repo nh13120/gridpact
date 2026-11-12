@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GridPact in 30 seconds</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --paper:#f4f4f1; --ink:#121212; --mid:#706f6c; --hair:#cecec8; --green:#00a65a; }
+  html, body { margin:0; height:100%; background:#111; }
+  body { display:flex; align-items:center; justify-content:center; }
+  #stage { width:min(100vw, calc(100vh * 16 / 9)); aspect-ratio:16/9; background:var(--paper); position:relative; overflow:hidden; }
+  svg { width:100%; height:100%; display:block; font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; }
+  #hint { position:absolute; right:14px; top:10px; font:12px Helvetica, Arial, sans-serif; color:var(--mid); opacity:.0; transition:opacity .3s; }
+  #stage:hover #hint { opacity:1; }
+</style>
+</head>
+<body>
+<div id="stage"><svg id="svg" viewBox="0 0 1280 720"></svg><div id="hint">click to replay</div></div>
+<script>
+// A deterministic 30-second timeline: draw(t) paints everything for time t (seconds). Open as is to play; add ?t=12.5 to freeze a moment.
+const W = 1280, H = 720, DUR = 30;
+const GREEN = '#00a65a', INK = '#121212', MID = '#706f6c', HAIR = '#cecec8', PAPER = '#f4f4f1';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const p = (t, a, b) => ease(clamp((t - a) / (b - a)));      // eased 0..1 between a and b
+const win = (t, a, b, fade = .4) => Math.min(clamp((t - a) / fade), clamp((b - t) / fade));   // 1 inside [a,b], fades at the edges
+const mix = (a, b, k) => a + (b - a) * k;
+const NUM = '"DIN Alternate","Bahnschrift","Arial Narrow",Arial,sans-serif';
+
+const T = (x, y, s, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size || 20}" font-weight="${o.w || 400}" fill="${o.fill || INK}" ` +
+  `text-anchor="${o.anchor || 'start'}" opacity="${o.op ?? 1}" ${o.ls ? `letter-spacing="${o.ls}"` : ''} ${o.font ? `font-family='${o.font}'` : ''} ` +
+  `${o.tr ? `transform="${o.tr}"` : ''}>${s}</text>`;
+const R = (x, y, w, h, o = {}) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${o.rx ?? 4}" fill="${o.fill || 'none'}" stroke="${o.stroke || 'none'}" ` +
+  `stroke-width="${o.sw || 2}" opacity="${o.op ?? 1}" ${o.tr ? `transform="${o.tr}"` : ''}/>`;
+const C = (x, y, r, o = {}) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${o.fill || 'none'}" stroke="${o.stroke || 'none'}" stroke-width="${o.sw || 3}" opacity="${o.op ?? 1}"/>`;
+const L = (x1, y1, x2, y2, o = {}) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${o.stroke || HAIR}" stroke-width="${o.sw || 2}" ` +
+  `opacity="${o.op ?? 1}" ${o.dash ? `stroke-dasharray="${o.dash}"` : ''}/>`;
+
+const POS = { buyer: [190, 340], A: [1010, 150], B: [1010, 430], aud: [600, 560] };
+const lerp = (a, b, k) => [mix(a[0], b[0], k), mix(a[1], b[1], k)];
+
+function node(key, label, t0, o = {}) {
+  const [x, y] = POS[key], k = p(window.__t, t0, t0 + .6), r = (o.r || 46) * (.6 + .4 * k);
+  return C(x, y, r, { fill: PAPER, stroke: o.color || INK, sw: 3, op: k }) + T(x, y + 6, label, { size: 17, w: 600, anchor: 'middle', op: k, fill: o.color || INK });
+}
+
+function caption(t) {
+  const caps = [[3.4, 9, 'AI agents will trade grid power.'], [9, 14, 'Every promise is backed by a deposit.'],
+                [14, 20, 'An auditor checks the claim against the public spec.'], [20, 25, 'Plain code settles. No AI.']];
+  let s = '';
+  for (const [a, b, txt] of caps) { const o = win(t, a, b, .5); if (o > 0) s += T(80, 668, txt, { size: 34, w: 300, op: o }); }
+  return s;
+}
+
+function draw(t) {
+  window.__t = t;
+  let s = R(0, 0, W, H, { fill: PAPER, rx: 0 });
+  // chrome: label strip and progress bar
+  s += T(80, 52, 'GRIDPACT  ·  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: t > 3 ? 1 : 0 });
+  s += L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: t > 3 ? 1 : 0 });
+  s += R(0, 712, W * clamp(t / DUR), 8, { fill: GREEN, rx: 0 });
+
+  // scene 1: title (0 to 4)
+  const s1 = win(t, 0, 3.7, .5) * (t < .3 ? clamp(t / .3) : 1);
+  if (s1 > 0) {
+    const reveal = 'GridPact'.slice(0, Math.max(0, Math.floor(mix(0, 9, clamp(t / 1.2)))));
+    s += T(100, 330, reveal, { size: 150, w: 300, op: s1 });
+    s += T(104, 400, 'Who checks a machine’s promise?', { size: 38, fill: MID, op: s1 * clamp((t - 1.3) / .6) });
+    s += R(104, 430, 70 * clamp((t - 1.9) / .6), 4, { fill: GREEN, rx: 0, op: s1 });
+  }
+
+  // scenes 2 to 5: the market
+  const mk = win(t, 3.4, 25.2, .5);
+  if (mk > 0) {
+    s += `<g opacity="${mk}">`;
+    const chk0 = win(t, 14.2, 19.6, .5);
+    for (const k of ['A', 'B']) s += L(POS.buyer[0] + 46, POS.buyer[1], POS[k][0] - 46, POS[k][1], { op: p(t, 4.2, 5) * (1 - .75 * chk0) });
+    s += node('buyer', 'Buyer', 3.7) + node('A', 'Seller A', 4.2) + node('B', 'Seller B', 4.6) + node('aud', 'Auditor', 5.2, { r: 40 });
+    s += T(POS.buyer[0], POS.buyer[1] + 80, 'needs 1,500 kWh/step', { size: 16, fill: MID, anchor: 'middle', op: p(t, 5, 5.6) });
+    s += T(POS.A[0], POS.A[1] + 76, 'honest · 5,000 kW', { size: 16, fill: MID, anchor: 'middle', op: p(t, 5.6, 6.2) });
+    s += T(POS.B[0], POS.B[1] + 76, 'claims 5,000 kW', { size: 16, fill: INK, w: 600, anchor: 'middle', op: p(t, 6.2, 6.8) });
+    s += T(POS.B[0], POS.B[1] + 98, 'real battery: 2,500 kW', { size: 16, fill: MID, anchor: 'middle', op: p(t, 7.4, 8.1) });
+
+    // scene 3: deposits (9 to 14)
+    const dep = [['A', 360, 360], ['B', 900, 900]];
+    for (const [k, amt] of dep) {
+      const [x, y] = POS[k], k1 = p(t, 9.4, 11.4), bx = x - 62, by = y + (k === 'A' ? 96 : 114);
+      let val = amt, boxFill = k1;
+      if (k === 'B') { const cut = p(t, 17.7, 18.9); val = Math.round(mix(900, 450, cut)); }
+      s += R(bx, by, 124, 40, { stroke: INK, sw: 2, op: p(t, 9.2, 9.8) });
+      s += R(bx + 2, by + 2, 120 * boxFill * (k === 'B' ? mix(1, .5, p(t, 17.7, 18.9)) : 1), 36, { fill: GREEN, op: .18 * p(t, 9.4, 9.8), rx: 3 });
+      s += T(x, by + 27, `deposit $${val}`, { size: 17, w: 600, anchor: 'middle', op: p(t, 9.8, 10.4) });
+      if (t > 9.4 && t < 11.6) {                       // coins flying from the seller into the box
+        for (let i = 0; i < 4; i++) { const kk = clamp((t - 9.6 - i * .25) / .6); if (kk > 0 && kk < 1) { const [cx, cy] = lerp([x, y + 46], [x, by + 6], ease(kk)); s += C(cx, cy, 6, { fill: GREEN }); } }
+      }
+    }
+
+    // scene 4: the check (14 to 20)
+    const chk = win(t, 14.2, 19.6, .5);
+    if (chk > 0) {
+      const bx = 340, by = 205;
+      s += `<g opacity="${chk}">`;
+      s += R(bx, by, 420, 190, { fill: PAPER, stroke: INK, sw: 2 });
+      s += T(bx + 24, by + 38, 'AUDITOR CHECK', { size: 12, w: 600, fill: GREEN, ls: 2 });
+      s += T(bx + 24, by + 78, 'Seller B claims', { size: 20, fill: MID }) + T(bx + 396, by + 78, '5,000 kW', { size: 26, w: 600, anchor: 'end', font: NUM });
+      s += T(bx + 24, by + 114, 'Public spec sheet', { size: 20, fill: MID, op: p(t, 15.2, 15.8) }) + T(bx + 396, by + 114, '2,500 kW', { size: 26, w: 600, anchor: 'end', font: NUM, op: p(t, 15.2, 15.8) });
+      const st = p(t, 16.4, 16.9);
+      if (st > 0) {
+        s += `<g transform="translate(${bx + 210} ${by + 152}) rotate(-4) scale(${mix(1.5, 1, st)})" opacity="${st}">` +
+             `<rect x="-150" y="-24" width="300" height="48" rx="4" fill="none" stroke="${GREEN}" stroke-width="3"/>` +
+             `<text x="0" y="8" text-anchor="middle" font-size="24" font-weight="700" fill="${GREEN}" letter-spacing="2">FALSE CLAIM · VALID</text></g>`;
+      }
+      s += '</g>';
+      // beam from auditor to B
+      const beam = p(t, 14.6, 15.6);
+      const [ax, ay] = POS.aud, [bx2, by2] = POS.B, [ex, ey] = lerp([ax + 36, ay - 14], [bx2 - 40, by2 + 30], beam);
+      s += L(ax + 36, ay - 14, ex, ey, { stroke: GREEN, sw: 3, dash: '8 6', op: chk });
+      // bounty coin from B's deposit to the auditor
+      const coin = clamp((t - 17.1) / 1.1);
+      if (coin > 0 && coin < 1) { const [cx, cy] = lerp([POS.B[0] - 40, POS.B[1] + 134], [ax + 20, ay + 40], ease(coin)); s += C(cx, cy, 14, { fill: GREEN, op: .95 }) + T(cx, cy + 5, '$', { size: 14, w: 700, fill: PAPER, anchor: 'middle' }); }
+      if (t > 18.2 && t < 20.2) s += T(ax - 62, ay + 7, '+$90 bounty', { size: 20, w: 600, fill: GREEN, anchor: 'end', op: win(t, 18.2, 20, .3) });
+      // the promise is cut
+      const cut = win(t, 17.9, 20, .4);
+      if (cut > 0) s += T(560, 470, 'promise cut 1,250 → 625 kWh/step', { size: 20, w: 600, anchor: 'middle', op: cut });
+    }
+
+    // scene 5: settlement (20 to 25)
+    const set = win(t, 20.2, 25, .4);
+    if (set > 0) {
+      for (const [k, n, col] of [['A', 6, GREEN], ['B', 3, GREEN]]) {
+        for (let i = 0; i < n; i++) {
+          const kk = ((t - 20.4) * .45 + i / n) % 1, [x, y] = lerp([POS[k][0] - 46, POS[k][1]], [POS.buyer[0] + 46, POS.buyer[1]], kk);
+          s += C(x, y, 7, { fill: col, op: set });
+        }
+      }
+      s += T(POS.buyer[0], POS.buyer[1] - 70, 'made whole', { size: 20, w: 600, fill: GREEN, anchor: 'middle', op: set });
+      // the ledger chain
+      for (let i = 0; i < 6; i++) {
+        const o = p(t, 21.2 + i * .35, 21.7 + i * .35), x = 640 + i * 96;
+        s += R(x, 612, 64, 30, { stroke: INK, sw: 2, op: o }) + T(x + 32, 633, '#' + (i + 1), { size: 14, w: 600, anchor: 'middle', op: o });
+        if (i) s += L(x - 32, 627, x, 627, { stroke: INK, sw: 2, op: o });
+      }
+      s += T(1215, 598, 'hash-chained ledger', { size: 13, fill: MID, anchor: 'end', op: p(t, 22.8, 23.4) * set });
+    }
+    s += '</g>';
+  }
+  s += caption(t);
+
+  // scene 6: evidence and end card (25 to 30)
+  const ev = p(t, 25, 25.8);
+  if (ev > 0) {
+    s += R(0, 0, W, H, { fill: PAPER, rx: 0, op: ev });
+    s += T(80, 52, 'GRIDPACT  ·  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: ev }) + L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: ev });
+    const nums = [['50/50', 'liars caught before settlement'], ['90%', 'of the buyer’s need delivered, up from 65%'], ['1,520', 'agents in one day, in 6 seconds']];
+    nums.forEach(([big, cap], i) => {
+      const o = p(t, 25.4 + i * .5, 26.2 + i * .5), x = 80 + i * 400;
+      s += T(x, 300 + (1 - o) * 24, big, { size: 128, w: 700, fill: GREEN, font: NUM, op: o }) + T(x + 4, 350, cap, { size: 20, fill: INK, op: o });
+    });
+    const end = p(t, 27.6, 28.4);
+    s += T(80, 500, 'GridPact', { size: 64, w: 300, op: end }) + T(84, 548, 'A referee for AI agents that trade energy.', { size: 26, fill: MID, op: end });
+    s += T(84, 600, 'github.com/nh13120/gridpact   ·   Nicolas Hong, Maheen Rassell', { size: 18, w: 600, op: p(t, 28.2, 28.8) });
+    s += R(0, 712, W * clamp(t / DUR), 8, { fill: GREEN, rx: 0 });
+  }
+  document.getElementById('svg').innerHTML = s;
+}
+
+const q = new URLSearchParams(location.search);
+if (q.has('t')) { draw(parseFloat(q.get('t'))); }
+else {
+  let t0 = null;
+  const tick = now => { if (t0 === null) t0 = now; const t = (now - t0) / 1000; draw(Math.min(t, DUR)); if (t < DUR) requestAnimationFrame(tick); };
+  const play = () => { t0 = null; requestAnimationFrame(tick); };
+  document.getElementById('stage').addEventListener('click', play);
+  play();
+}
+</script>
+</body>
+</html>

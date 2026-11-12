@@ -69,3 +69,8 @@ A retried `propose` used to open a second offer and accepting both double-booked
 - Not done: a tool or field that exposes the nameplate, and push notifications to agents.
 - Real weather (Open-Meteo) explains plant solar output (r 0.82 to 0.94) but not the battery's charge at 17:00 (R2 <= 0.07), so it is
   not used in settlement. `python -m benchmark.weather_check`; the weather cache is not committed (keyed by plant coordinates).
+- 2026-11-12, notices: run 2's failure (a buyer that never looked at its commitments again) was a property of an interface that pushes
+  nothing, so the guide note was a weak fix. Cut commitments are now announced on the affected agents' next successful call, once, on
+  any tool (`notices` in the reply; table `notices`). Run 4 passed 16 of 16. Not claimed: that every buyer notices; one run each.
+- `docs/gridpact_30s.html` is a 30-second animation of the story (deterministic timeline; `?t=12.5` freezes a moment); `GridPact_30s.mp4`
+  is its render for the demo-video slide.
