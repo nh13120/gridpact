@@ -73,6 +73,10 @@ CREATE TABLE IF NOT EXISTS challenges (
 -- at most one valid challenge per commitment, enforced by SQLite even under concurrent calls
 CREATE UNIQUE INDEX IF NOT EXISTS one_valid_challenge ON challenges(commitment_id) WHERE verdict = 'valid';
 CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT);
+-- messages about changes to an agent's commitments; the server attaches the undelivered ones to the agent's next reply
+CREATE TABLE IF NOT EXISTS notices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, agent_id TEXT NOT NULL, text TEXT NOT NULL, delivered INTEGER NOT NULL DEFAULT 0
+);
 CREATE TABLE IF NOT EXISTS ledger (
     seq          INTEGER PRIMARY KEY,
     ts           TEXT NOT NULL,

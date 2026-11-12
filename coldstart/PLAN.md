@@ -99,3 +99,18 @@ Change: the guide now says plainly that a position can change until settlement a
 reporting. Run 3: three new fresh clients, same tasks, same checks. Written now: B7 should pass if the buyer re-reads before
 it reports; B3 passes only if it also re-sources 625 kWh/step from `PVB_17`. Not expected to be fully deterministic: the
 auditor's timing varies between runs, and a buyer that finishes before the challenge will still report a stale position.
+
+## Run 2 failure: the cause fixed, and run 4 (written after run 3, before run 4)
+
+Run 3 passed, but it depended on the buyer choosing to re-read. Run 2's failure (a buyer that stopped looking at its commitments
+and reported a stale position) was a property of the interface, which pushes nothing, so the guide note was a weak fix.
+Change: the server now attaches **notices** to the reply of the affected agent's next successful call, once, whichever tool it
+calls (`tests/test_notices.py`). In run 2 the buyer was still calling `find_counterparties` every 30 s for five minutes after the
+challenge, so it would have been told. Run 4: three new fresh clients, the same tasks and checks, with the buyer's boundary
+sentence extended so the step-range limit is reached live on a registered seller (run 1 to 3 hit "not registered" first):
+"Also, as boundary checks, (a) ask a seller PVB_99 for 100 kWh per step for steps 100 to 110 and (b) ask any seller that is listed
+for 100 kWh per step for steps 100 to 110; report what happens to each", with one more JSON field, `range_outcome`.
+New check **B8**: a refusal containing "steps must satisfy" on a registered seller, nothing created, reported. Runs 1 to 3 are not
+edited; they were scored without B8. Expected, written now: B7 passes whenever the buyer makes any call after the challenge; B8 passes
+if the buyer attempts (b). The auditor's timing still varies, so a buyer that finishes before the challenge reports a position that was
+correct when it finished.

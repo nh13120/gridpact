@@ -77,6 +77,9 @@ def main():
         except ValueError:
             rep = {}
     checks["B6"] = refused_99 and nothing_made and bool(rep.get("pvb99_outcome"))
+    # B8 (added for run 4): the step-range limit is reached live, on a registered seller, not hidden behind "not registered"
+    checks["B8"] = any(n == "propose" and a_.get("step_from", 0) >= 96 and a_.get("to") != "PVB_99" and r and not r["ok"]
+                       and "steps must satisfy" in r.get("reason", "") for n, a_, r in calls) and nothing_made and bool(rep.get("range_outcome"))
     kwh = sum(c["kwh_per_step"] * (c["step_to"] - c["step_from"] + 1) for c in com)
     cost = sum(c["kwh_per_step"] * (c["step_to"] - c["step_from"] + 1) / 1000 * c["price_usd_mwh"] for c in com)
     close = lambda x, y: y and abs(x - y) <= 0.01 * max(abs(y), 1e-9)
@@ -97,8 +100,9 @@ def main():
     liar = [dict(r) for r in q("SELECT * FROM commitments WHERE seller = 'PVB_37'")]
     settled = bool(q("SELECT 1 FROM settlements"))
     checks["Y2"] = settled and all(c["kwh_per_step"] <= 625 for c in liar) and bool(liar)
+    got_notice = any(n for n in [json.loads(l)["resp"] for l in (run / "buyer.jsonl").read_text().splitlines()] if "notices" in n)
     md = ["| check | result |", "|---|---|"] + [f"| {k} | {'PASS' if v else 'FAIL'} |" for k, v in checks.items()]
-    facts = {"buyer_commitments": [(c["seller"], c["kwh_per_step"], c["price_usd_mwh"]) for c in com], "buyer_kwh": kwh, "buyer_cost_usd": round(cost, 2),
+    facts = {"buyer_got_notice": got_notice, "buyer_commitments": [(c["seller"], c["kwh_per_step"], c["price_usd_mwh"]) for c in com], "buyer_kwh": kwh, "buyer_cost_usd": round(cost, 2),
              "challenges": [(c["seller"], c["verdict"], c["bounty_usd"]) for c in ch], "offers": [dict(r) for r in q("SELECT offer_id, from_agent, to_agent, status, kwh_per_step, price_usd_mwh FROM offers")]}
     (run / "score.json").write_text(json.dumps({"checks": checks, "facts": facts}, indent=1, default=str))
     print("\n".join(md)); print(json.dumps(facts, default=str)[:1500])

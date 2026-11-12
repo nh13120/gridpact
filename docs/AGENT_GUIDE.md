@@ -40,6 +40,8 @@ curl -s $URL $H -H "Mcp-Session-Id: $SID" -d '{"jsonrpc":"2.0","id":2,"method":"
 
 Every tool returns a JSON object with `"ok": true` or `"ok": false, "reason": "..."`. A refused call changes nothing.
 
+A successful reply may also carry `"notices": ["..."]`: messages about changes to your own commitments (for example one was cut by a valid challenge) that happened since you last made a successful call. Each notice is delivered once, on whichever call you make next, so read the `notices` of every reply.
+
 ## 3. Tools
 
 Time is a day of 96 steps of 15 minutes, numbered 0 to 95 in local time. Step 68 is 17:00; steps 68 to 79
@@ -74,9 +76,9 @@ delivered vs committed kWh and any penalty in the ledger.
   cap. An invalid challenge costs you a $50 bond. One valid challenge per commitment.
 - **Tokens.** Your token is your identity. Do not share it. Wrong or missing tokens are refused.
 - **Your position can change after you agree, until the day is settled.** A valid challenge cuts the liar's commitment to
-  its real cap at any moment, so a buyer may end up with less than it agreed, and nothing is pushed to you. Re-read
-  `get_commitments` right before you act on or report your position (not only once after accepting), and if a commitment
-  was cut (`trimmed_from_kwh` is not null), propose the missing volume to another seller. A `trim` entry in `get_ledger` marks the moment.
+  its real cap at any moment, so a buyer may end up with less than it agreed, and nothing is pushed to you. You are told once, in `notices`, on your next call; still re-read
+  `get_commitments` right before you act on or report your position, and if a commitment was cut (`trimmed_from_kwh` is not
+  null), propose the missing volume to another seller. A `trim` entry in `get_ledger` marks the moment.
 - **What GridPact does not do.** No cancel or withdraw of an offer. Offers only expire if the operator advances
   negotiation rounds. No area filter: every seller is listed. One simulated day. Identity is a token, not a signature.
 

@@ -13,6 +13,7 @@ import os
 import secrets
 import socket
 import functools
+import inspect
 import threading
 import subprocess
 import sys
@@ -32,11 +33,28 @@ _write = threading.RLock()
 
 def _locked(fn):
     """Run a tool under the write lock. The single SQLite connection is shared by all worker threads, so even
-    registration (which appends to the ledger) and the read tools must not run at the same time as a write."""
+    registration (which appends to the ledger) and the read tools must not run at the same time as a write.
+
+    Notices: nothing is pushed to agents, so if the caller has unread notices (for example one of its commitments was
+    cut by a valid challenge), they ride along on the reply of its next successful call as `notices`, once."""
+    takes_token = "token" in inspect.signature(fn).parameters
+
     @functools.wraps(fn)
     def run(*a, **k):
         with _write:
-            return fn(*a, **k)
+            out = fn(*a, **k)
+            if takes_token and isinstance(out, dict) and out.get("ok"):
+                token = k.get("token", a[0] if a else None)
+                me = _agent(token) if isinstance(token, str) else None
+                if me:
+                    rows = conn_().execute("SELECT id, text FROM notices WHERE agent_id = ? AND delivered = 0 ORDER BY id",
+                                           (me["agent_id"],)).fetchall()
+                    if rows:
+                        conn_().execute(f"UPDATE notices SET delivered = 1 WHERE id IN ({','.join('?' * len(rows))})",
+                                        [r["id"] for r in rows])
+                        conn_().commit()
+                        out = {**out, "notices": [r["text"] for r in rows]}
+            return out
     return run
 
 

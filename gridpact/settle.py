@@ -138,6 +138,11 @@ def trim_to_real_cap(conn, seller_id, real_cap):
                      (new_kwh, new_stake, c["kwh_per_step"], c["commitment_id"]))
         conn.execute("UPDATE agents SET stake_locked_usd = MAX(0, stake_locked_usd - ?) WHERE agent_id = ?",
                      (released, seller_id))
+        for who in (c["buyer"], seller_id):       # tell both parties on their next call: nothing else is pushed to agents
+            conn.execute("INSERT INTO notices (agent_id, text) VALUES (?, ?)",
+                         (who, f"commitment #{c['commitment_id']} between {c['buyer']} (buyer) and {seller_id} (seller) was cut from "
+                               f"{c['kwh_per_step']:.0f} to {new_kwh:.0f} kWh/step by a valid challenge; the stake locked on the cut part "
+                               f"(${released:.2f}) was released. Call get_commitments for the current position."))
         ledger.append(conn, "gridpact", "trim", {"commitment_id": c["commitment_id"], "seller": seller_id,
                                                  "buyer": c["buyer"], "from_kwh": c["kwh_per_step"], "to_kwh": new_kwh,
                                                  "released_stake_usd": round(released, 2)})
