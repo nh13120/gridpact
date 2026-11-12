@@ -10,6 +10,7 @@ deterministic settlement and an independent verifier. Spec in `PLAN.md`, status 
 ## Run
 - `python orchestrate.py --demo` — reset DB, run one day with the LLM agents (~$0.01), then verify
 - `python verify.py` — re-check the last run independently (exit 1 on any FAIL)
+- `python demo_deposits.py [--no-audit]` — 2-minute walkthrough of deposits, the auditor and settlement (no LLM, no data, no key)
 - `python -m gridpact.server` — just the MCP server at http://127.0.0.1:8765/mcp
 
 ## Test
