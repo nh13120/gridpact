@@ -135,3 +135,19 @@ other than the guide). New check **A4**: the auditor's proxy log shows a success
 S1 to S3, A1 to A3, Y1, Y2 unchanged, so 17 in all. Expected, written now: A2 and A3 pass as before; A4 passes if the auditor finds the
 tool from the guide. Caveat to disclose: the clients share a machine and a working directory with the repository, so the file
 was still reachable; the instruction, not the sandbox, keeps it out of reach. Runs 1 to 4 are not edited and were scored without A4.
+
+## Run 5 result (appended after the run)
+
+16 of 17 checks. **B7 failed**, as scored by the check fixed before the run: the buyer reported `total_kwh` 1,500 (its kWh per step) where the
+database holds 18,000 kWh over the 12 steps; its commitments (625 + 250 + 625 kWh/step at $55), its cost ($990), its refusals and its
+range probe were all correct. Classification: **test-setup problem, not a GridPact limitation**: the task text names the field `total_kwh`
+without saying "over the whole window", the run 1 to 4 buyers read it as window energy and this one did not. The check is not changed after the
+fact and the run is not repeated until it passes.
+What worked: A4 passes, the auditor (told to read nothing but the guide) called `get_registry` at +7 s, saw PVB_37 declare 5,000 kW against a
+2,500 kW nameplate, challenged once, valid, $90 bounty, and left the honest PVB_17 alone (3 commitments checked, 31 polling rounds). The buyer's
+next call after the cut (`find_counterparties`, +7 s) carried the notice; the buyer did not read `notices` there, found the cut itself through
+`get_commitments` 55 s later (its report says notices were never delivered, which its own proxy log contradicts: the field is on that reply),
+bought the missing 625 kWh/step from PVB_17 and reported a position that matches the database apart from the unit above. So the notices reach the
+client, but an agent that never reads the field is not helped by it; the guide now says to read `notices` on every reply, including list calls.
+Guide edits made after this run, not rerun: that sentence; offer ids are global (a seller sees only its own, so ids skip); there is no "done" signal,
+the operator closes the day and settle entries then appear in the ledger. Test bed stopped after scoring, every offer to the seller answered.

@@ -66,7 +66,7 @@ A retried `propose` used to open a second offer and accepting both double-booked
 - Run 1 found that a buyer cannot see a challenge cutting its commitment (get_inbox shows only offer status). Fix: `get_commitments`.
   Run 2 still failed the same two checks because the buyer did not re-read; the guide now says to re-read right before acting or
   reporting. Run 3 passed 15 of 15. One run per condition: no rate is claimed.
-- Not done: a tool or field that exposes the nameplate, and push notifications to agents.
+- Not done at that point: a tool or field that exposes the nameplate (done later, see below), and push notifications to agents.
 - Real weather (Open-Meteo) explains plant solar output (r 0.82 to 0.94) but not the battery's charge at 17:00 (R2 <= 0.07), so it is
   not used in settlement. `python -m benchmark.weather_check`; the weather cache is not committed (keyed by plant coordinates).
 - 2026-11-12, notices: run 2's failure (a buyer that never looked at its commitments again) was a property of an interface that pushes
@@ -74,3 +74,10 @@ A retried `propose` used to open a second offer and accepting both double-booked
   any tool (`notices` in the reply; table `notices`). Run 4 passed 16 of 16. Not claimed: that every buyer notices; one run each.
 - `docs/gridpact_30s.html` is a 30-second animation of the story (deterministic timeline; `?t=12.5` freezes a moment); `GridPact_30s.mp4`
   is its render for the demo-video slide.
+- 2026-11-16, `get_registry`: the last open interface gap from runs 1 to 4 (the nameplate was only in a parquet file, so the auditor needed file access
+  and borrowed the repository's interpreter). New tool: each registered agent's public `nameplate_kw` next to its `declared_flex_kw`, facts only, no verdict,
+  any registered agent may call it. It is public registry data, not a truth column (`bess_power_true_kw` stays verify.py's). Run 5: the auditor, told to read
+  nothing but the guide, used it and challenged correctly (A4). 16 of 17: B7 failed because the buyer reported kWh per step as `total_kwh`; classified as a
+  task-wording problem, check not changed, run not repeated. Run 5 also showed that a notice helps only an agent that reads the field (the buyer's next call carried
+  it; the buyer ignored it on that reply), so the guide now says to read `notices` on every reply. `coldstart/runs/*` logs are now tracked (databases and
+  server logs are not; operator keys redacted). Not done: a real independent client (another builder's agent).

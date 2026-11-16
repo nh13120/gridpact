@@ -1,0 +1,76 @@
+{
+ "checks": {
+  "B1": true,
+  "B2": true,
+  "B3": true,
+  "B4": true,
+  "B5": true,
+  "B6": true,
+  "B8": true,
+  "B7": false,
+  "S1": true,
+  "S2": true,
+  "S3": true,
+  "A1": true,
+  "A2": true,
+  "A3": true,
+  "A4": true,
+  "Y1": true,
+  "Y2": true
+ },
+ "facts": {
+  "buyer_got_notice": true,
+  "buyer_commitments": [
+   [
+    "PVB_37",
+    625.0,
+    55.0
+   ],
+   [
+    "PVB_17",
+    250.0,
+    55.0
+   ],
+   [
+    "PVB_17",
+    625.0,
+    55.0
+   ]
+  ],
+  "buyer_kwh": 18000.0,
+  "buyer_cost_usd": 990.0,
+  "challenges": [
+   [
+    "PVB_37",
+    "valid",
+    90.0
+   ]
+  ],
+  "offers": [
+   {
+    "offer_id": 1,
+    "from_agent": "COM_09",
+    "to_agent": "PVB_37",
+    "status": "accepted",
+    "kwh_per_step": 1250.0,
+    "price_usd_mwh": 55.0
+   },
+   {
+    "offer_id": 2,
+    "from_agent": "COM_09",
+    "to_agent": "PVB_17",
+    "status": "accepted",
+    "kwh_per_step": 250.0,
+    "price_usd_mwh": 55.0
+   },
+   {
+    "offer_id": 3,
+    "from_agent": "COM_09",
+    "to_agent": "PVB_17",
+    "status": "accepted",
+    "kwh_per_step": 625.0,
+    "price_usd_mwh": 55.0
+   }
+  ]
+ }
+}

@@ -1,0 +1,1 @@
+{"buyer": "{\"commitments\":[{\"seller\":\"PVB_37\",\"kwh_per_step\":1250,\"price_usd_mwh\":55},{\"seller\":\"PVB_17\",\"kwh_per_step\":250,\"price_usd_mwh\":55}],\"total_kwh\":18000,\"total_cost_usd\":990.0,\"pvb99_outcome\":\"refused: 'PVB_99 is not registered'; still not registered after about 5 minutes of polling, so no offer was created\"}"}

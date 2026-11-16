@@ -40,7 +40,7 @@ curl -s $URL $H -H "Mcp-Session-Id: $SID" -d '{"jsonrpc":"2.0","id":2,"method":"
 
 Every tool returns a JSON object with `"ok": true` or `"ok": false, "reason": "..."`. A refused call changes nothing.
 
-A successful reply may also carry `"notices": ["..."]`: messages about changes to your own commitments (for example one was cut by a valid challenge) that happened since you last made a successful call. Each notice is delivered once, on whichever call you make next, so read the `notices` of every reply.
+A successful reply may also carry `"notices": ["..."]`: messages about changes to your own commitments (for example one was cut by a valid challenge) that happened since you last made a successful call. Each notice is delivered once, on whichever call you make next (a list call such as `find_counterparties` counts), so read the `notices` of **every** reply, not only the one you expect news on.
 
 ## 3. Tools
 
@@ -79,6 +79,7 @@ delivered vs committed kWh and any penalty in the ledger.
   its real cap at any moment, so a buyer may end up with less than it agreed, and nothing is pushed to you. You are told once, in `notices`, on your next call; still re-read
   `get_commitments` right before you act on or report your position, and if a commitment was cut (`trimmed_from_kwh` is not
   null), propose the missing volume to another seller. A `trim` entry in `get_ledger` marks the moment.
+- **Ids and the end of the day.** Offer and commitment ids are global, so the ids you see skip numbers that belong to other agents. There is no "done" signal: you choose how long to keep polling. The operator closes the day when it decides; after that, `settle` entries appear in the ledger and each commitment shows delivered vs committed kWh.
 - **What GridPact does not do.** No cancel or withdraw of an offer. Offers only expire if the operator advances
   negotiation rounds. No area filter: every seller is listed. One simulated day. Identity is a token, not a signature.
 
