@@ -18,3 +18,6 @@ benchmark/HW7_report.pdf
 
 # real weather cache (fetched on demand from Open-Meteo; keyed by the dataset's plant coordinates, so not committed)
 fixtures/weather/
+
+# HW9 cold-start evidence: keep the proxy logs, scores and reports (databases and server logs stay ignored by *.db / server.log)
+!coldstart/runs/

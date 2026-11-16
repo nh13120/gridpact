@@ -121,3 +121,17 @@ correct when it finished.
 a notice saying so, it bought the missing 125 kWh/step from `PVB_17`, re-read `get_commitments` and reported 18,000 kWh / $990, which
 matches the database. Its range probe reached "steps must satisfy 0 <= step_from <= step_to < 96" on the registered `PVB_37`, nothing
 created. Runs 1 to 3 were scored without B8 and are unchanged. Test bed stopped after every offer to the seller had been answered.
+
+## Run 5: the nameplate gap, closed and retested (written after run 4, before run 5)
+
+What run 4 left open (see the report): the auditor could only learn a seller's real battery size from a parquet file, so it
+needed file access and a parquet reader (it borrowed the repository's interpreter, a deviation from "documentation only").
+Change: a new tool `get_registry(token)` returns each registered agent's public `nameplate_kw` next to its `declared_flex_kw`
+(facts only, no verdict, any registered agent may call it); the guide now says so. Regression tests: `tests/test_get_registry.py`.
+Run 5: three new fresh clients, the same buyer and seller task texts as run 4, the same auditor task text, but the auditor is
+**not** authorised to read the registry file and is told to use only HTTP and the guide (its prompt names no tool and no file
+other than the guide). New check **A4**: the auditor's proxy log shows a successful `get_registry` call before its first
+`challenge`. Self-reported, not machine-checked: the auditor's list of files read should be the guide only. Checks B1 to B8,
+S1 to S3, A1 to A3, Y1, Y2 unchanged, so 17 in all. Expected, written now: A2 and A3 pass as before; A4 passes if the auditor finds the
+tool from the guide. Caveat to disclose: the clients share a machine and a working directory with the repository, so the file
+was still reachable; the instruction, not the sandbox, keeps it out of reach. Runs 1 to 4 are not edited and were scored without A4.

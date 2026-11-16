@@ -163,6 +163,22 @@ def find_counterparties(token: str) -> dict:
 
 @mcp.tool()
 @_locked
+def get_registry(token: str) -> dict:
+    """The public registry facts for every registered agent: its `nameplate_kw` (the battery power from the
+    public ENGIE registry, null for buyers and auditors) next to the `declared_flex_kw` it claims. A seller
+    whose declared figure is more than 10% above its nameplate can be challenged (see `challenge`). Any registered
+    agent may call this. It returns facts only; it does not rule on anyone."""
+    if not _agent(token):
+        return {"ok": False, "reason": "unknown token; call register_agent first"}
+    rows = conn_().execute("SELECT agent_id, role, bess_power_kw, declared_flex_kw FROM agents "
+                           "ORDER BY agent_id").fetchall()
+    return {"ok": True, "agents": [{"agent_id": r["agent_id"], "role": r["role"],
+                                    "nameplate_kw": None if r["bess_power_kw"] is None else round(r["bess_power_kw"], 1),
+                                    "declared_flex_kw": round(r["declared_flex_kw"], 1)} for r in rows]}
+
+
+@mcp.tool()
+@_locked
 def propose(token: str, to: str, step_from: int, step_to: int, kwh_per_step: float,
             price_usd_mwh: float, penalty_usd_mwh: float, request_id: str | None = None) -> dict:
     """Offer a trade: `kwh_per_step` delivered in every 15-min step from step_from to

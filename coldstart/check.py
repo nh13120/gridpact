@@ -96,6 +96,11 @@ def main():
     chal_seq = [e["seq"] for e in ledger.entries(conn) if e["action"] == "challenge"]
     checks["A2"] = any(c["seller"] == "PVB_37" and c["verdict"] == "valid" for c in ch) and (not chal_seq or min(chal_seq) < first_settle or not a.settle)
     checks["A3"] = not any(c["verdict"] == "invalid" for c in ch)
+    # A4 (added for run 5): the auditor read the registry through the tools, before its first challenge
+    ac = [n for n, _, _ in tool_calls(run / "auditor.jsonl")]
+    reg = next((i for i, (n, _, r) in enumerate(tool_calls(run / "auditor.jsonl")) if n == "get_registry" and r and r.get("ok")), None)
+    first_ch = ac.index("challenge") if "challenge" in ac else None
+    checks["A4"] = reg is not None and first_ch is not None and reg < first_ch
     checks["Y1"] = ledger.verify_chain(conn) is None
     liar = [dict(r) for r in q("SELECT * FROM commitments WHERE seller = 'PVB_37'")]
     settled = bool(q("SELECT 1 FROM settlements"))
