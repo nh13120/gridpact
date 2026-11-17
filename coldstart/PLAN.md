@@ -151,3 +151,12 @@ bought the missing 625 kWh/step from PVB_17 and reported a position that matches
 client, but an agent that never reads the field is not helped by it; the guide now says to read `notices` on every reply, including list calls.
 Guide edits made after this run, not rerun: that sentence; offer ids are global (a seller sees only its own, so ids skip); there is no "done" signal,
 the operator closes the day and settle entries then appear in the ledger. Test bed stopped after scoring, every offer to the seller answered.
+
+## Run 6: run 5 again with the one ambiguous word fixed (written after run 5, before run 6)
+
+Run 5's only miss (B7) came from the task text, not from GridPact: the buyer's final JSON field `total_kwh` does not say "over the whole window", and
+that buyer reported kWh per step. Run 6 is run 5 repeated with fresh clients, the same checks (17, unchanged, including B7) and the same seller and auditor
+tasks, with exactly one change to the buyer's task text: the JSON line now reads `"total_kwh": the energy over all the steps you secured (kwh_per_step x
+number of steps, summed over your commitments), "total_cost_usd": ..`. No check, tool, guide text or other task text changes. Expected, written now:
+B7 passes if the buyer's report matches the database; everything else as in run 5. This is a test-setup fix, disclosed as such. If run 6 fails any check, it is
+reported as it is. Runs 5 and 6 are kept side by side; neither replaces the other.
