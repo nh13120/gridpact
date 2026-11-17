@@ -20,4 +20,4 @@ Check the phase's "done when" command before ticking it. Details in `PLAN.md`.
 ## What's next
 Read `benchmark/README.md`. Open question for the next iteration: a second audit after re-sourcing (recall fell at 12-16 sellers in v2). December work after that (see README "Next steps").
 
-- [x] HW9: agent guide, cold-start test (5 runs), get_commitments, notices, get_registry, boundary and regression tests, final slides and report (`coldstart/report/`, built by `make_report.py`; slides by `slide/make_slides.py`)
+- [x] HW9: agent guide, cold-start test (6 runs; run 6 passed 17 of 17 after a task-wording fix, run 5 kept at 16 of 17), get_commitments, notices, get_registry, boundary and regression tests, final slides and report (`coldstart/report/`, built by `make_report.py`; slides by `slide/make_slides.py`)

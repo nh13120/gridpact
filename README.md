@@ -62,7 +62,7 @@ Every tool call and result is also written to `runs/<timestamp>/transcript.jsonl
 agents/run_agent.py (Claude Agent SDK, Haiku 5.5, one process per turn)
    |  MCP tool calls (streamable HTTP, http://127.0.0.1:8765/mcp)
    v
-gridpact/server.py (7 tools)  --->  gridpact.db (SQLite: agents, offers, commitments, settlements, challenges, ledger)
+gridpact/server.py (10 tools)  --->  gridpact.db (SQLite: agents, offers, commitments, settlements, challenges, ledger)
                                         ^
 gridpact/settle.py (deterministic) -----+---- reads ENGIE parquet (obs columns)
 verify.py (independent; imports nothing from gridpact/; the only reader of truth columns)

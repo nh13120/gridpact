@@ -53,7 +53,7 @@ function caption(t) {
 }
 
 // real time -> market time u: the setup runs fast (slides already explain the idea), the mechanism gets the room
-const warp = r => r < 4.5 ? 3.4 + r * (5.6 / 4.5) : r < 22.8 ? 9 + (r - 4.5) * (14.6 / 18.3) : 23.6 + (r - 22.8);
+const warp = r => r < 4 ? 3.4 + r * (5.6 / 4) : r < 15.5 ? 9 + (r - 4) * (14.6 / 11.5) : 23.6 + (r - 15.5);
 function draw(real) {
   const t = warp(real);
   window.__t = t;
@@ -140,30 +140,49 @@ function draw(real) {
   }
   s += caption(t);
 
-  // scene 6 (22.9 to 27): did it work, one number.  scene 7 (27 to 30): the ask
-  const ev = p(real, 22.9, 23.5), evOut = p(real, 26.7, 27.3);
+  // scene 6 (15.3 to 25.2): the real product, from a recorded run.  scene 7 (25 to 30): one number
+  const tm = win(real, 15.3, 25.2, .5);
+  if (tm > 0) {
+    s += `<g opacity="${tm}">` + R(0, 0, W, H, { fill: PAPER, rx: 0 });
+    s += T(80, 52, 'GRIDPACT  ·  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2 }) + L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1 });
+    s += T(80, 112, 'THE REAL PRODUCT, RUNNING', { size: 15, w: 600, fill: GREEN, ls: 2.4 });
+    s += R(80, 132, 1120, 484, { fill: '#161a18', rx: 10 });
+    for (let i = 0; i < 3; i++) s += C(106 + i * 24, 156, 7, { fill: ['#ff5f57', '#febc2e', '#28c840'][i] });
+    const TL = [
+      [15.7, '$ python -m gridpact.server', '#3ddc8b', 700], [16.4, 'GridPact server up (synthetic registry)', '#8aa092', 400],
+      [17.2, 'auditor ▸ get_registry', '#ffffff', 700], [17.8, '   PVB_37   nameplate 2500 kW   declared 5000 kW', '#d6e0d8', 400],
+      [18.3, '   PVB_17   nameplate 5000 kW   declared 5000 kW', '#d6e0d8', 400],
+      [19.0, 'auditor ▸ challenge(commitment 1)', '#ffffff', 700], [19.6, '   verdict: valid     bounty_usd: 90.0', '#3ddc8b', 700],
+      [20.4, 'buyer   ▸ get_inbox', '#ffffff', 700], [20.9, '   notice: commitment #1 cut from 1250 to 625 kWh/step; $450 stake released', '#d6e0d8', 400],
+      [22.0, 'buyer   ▸ propose(PVB_17, 625 kWh/step, $55/MWh)', '#ffffff', 700], [22.6, '   ok   offer_id 3', '#d6e0d8', 400],
+      [23.2, 'buyer   ▸ get_commitments', '#ffffff', 700], [23.7, '   PVB_37 625 (was 1250) · PVB_17 250 · PVB_17 625   =   1500 kWh/step', '#3ddc8b', 700]];
+    TL.forEach(r => { r[0] = 15.7 + (r[0] - 15.7) * 0.86; });
+    let last = -1;
+    TL.forEach(([t0, txt, col, w], i) => { if (real >= t0) last = i; });
+    TL.forEach(([t0, txt, col, w], i) => {
+      const n = Math.max(0, Math.min(txt.length, Math.floor((real - t0) * 70)));
+      if (n <= 0) return;
+      const cur = (i === last && real < 25 && Math.floor(real * 3) % 2 === 0 && n < txt.length + 1) ? '▌' : '';
+      s += `<text x="108" y="${210 + i * 31}" font-size="21" font-weight="${w}" fill="${col}" xml:space="preserve" font-family="Menlo, Consolas, 'DejaVu Sans Mono', monospace">${(txt.slice(0, n) + cur).replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text>`;
+    });
+    s += T(80, 668, 'Recorded from a real run: fresh AI agents calling the real GridPact server.', { size: 22, w: 400, fill: INK, op: p(real, 15.8, 16.4) });
+    s += R(0, 712, W * clamp(real / DUR), 8, { fill: GREEN, rx: 0 }) + '</g>';
+  }
+
+  const ev = p(real, 25.0, 25.6);
   if (ev > 0) {
     s += R(0, 0, W, H, { fill: PAPER, rx: 0, op: ev });
-    s += T(80, 52, 'GRIDPACT  \u00b7  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: ev }) + L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: ev });
-    const eo = ev * (1 - evOut);
-    s += T(80, 150, 'DOES IT WORK?  IN OUR TESTS, YES.', { size: 15, w: 600, fill: GREEN, ls: 2.4, op: eo });
-    const o1 = p(real, 23.3, 24) * (1 - evOut), o2 = p(real, 24.4, 25.1) * (1 - evOut);
+    s += T(80, 52, 'GRIDPACT  ·  MAS.665 AI STUDIO', { size: 12, w: 600, ls: 2, op: ev }) + L(80, 70, W - 80, 70, { stroke: HAIR, sw: 1, op: ev });
+    s += T(80, 150, 'DOES IT WORK?  IN OUR TESTS, YES.', { size: 15, w: 600, fill: GREEN, ls: 2.4, op: ev });
+    const o1 = p(real, 25.3, 25.9), o2 = p(real, 26.4, 27.0);
     s += T(80, 240, 'BEFORE OUR FIX', { size: 15, w: 600, fill: MID, ls: 2.4, op: o1 });
     s += T(80, 400, '65%', { size: 190, w: 700, fill: MID, font: NUM, op: o1 });
-    s += T(84, 450, 'of the buyer\u2019s energy delivered', { size: 26, fill: MID, op: o1 });
+    s += T(84, 450, 'of the buyer’s energy delivered', { size: 26, fill: MID, op: o1 });
     s += T(660, 240, 'AFTER', { size: 15, w: 600, fill: GREEN, ls: 2.4, op: o2 });
     s += T(660, 400, '90%', { size: 190, w: 700, fill: GREEN, font: NUM, op: o2 });
-    s += T(664, 450, 'of the buyer\u2019s energy delivered', { size: 26, w: 600, op: o2 });
-    s += T(80, 560, 'Simulated trading day, 6 sellers, one of them lying. The auditor now cuts the liar\u2019s promise, and the energy goes back to the market.', { size: 20, fill: MID, op: p(real, 25.2, 25.9) * (1 - evOut) });
-    const end = p(real, 27, 27.6);
-    if (end > 0) {
-      s += R(0, 80, W, H - 90, { fill: PAPER, rx: 0, op: end });
-      s += T(80, 300, 'Next: a pilot with one ENGIE community.', { size: 54, w: 600, op: end });
-      s += T(84, 360, 'No money moving. Real agents, real data, a referee in the loop.', { size: 28, fill: MID, op: p(real, 27.4, 28) });
-      s += R(84, 400, 70 * p(real, 27.6, 28.2), 4, { fill: GREEN, rx: 0, op: end });
-      s += T(84, 480, 'GridPact', { size: 40, w: 600, op: p(real, 28, 28.6) });
-      s += T(84, 560, 'github.com/nh13120/gridpact   \u00b7   Nicolas Hong, Maheen Rassell', { size: 20, w: 600, fill: MID, op: p(real, 28.4, 29) });
-    }
+    s += T(664, 450, 'of the buyer’s energy delivered', { size: 26, w: 600, op: o2 });
+    s += T(80, 540, 'Simulated trading day, 6 sellers, one lying. The auditor cuts the liar’s promise and the energy goes back to market.', { size: 20, fill: MID, op: p(real, 27.2, 27.8) });
+    s += T(80, 650, 'GridPact  ·  github.com/nh13120/gridpact', { size: 20, w: 600, fill: INK, op: p(real, 28.0, 28.6) });
     s += R(0, 712, W * clamp(real / DUR), 8, { fill: GREEN, rx: 0 });
   }
   document.getElementById('svg').innerHTML = s;
