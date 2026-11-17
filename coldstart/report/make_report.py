@@ -74,7 +74,7 @@ def build(deck_url, out):
     S = []
     S += [p("GridPact: agent usability and final project slides", H1),
           p("Homework 9, MAS.665 AI Studio, Fall 2026. Team: Nicolas Hong, Maheen Rassell.", B), p("Links", H2)]
-    S.append(table([["Interface documentation", "https://github.com/nh13120/gridpact/blob/hw9-agent-usability/docs/AGENT_GUIDE.md"],
+    S.append(table([["Interface documentation", "https://github.com/nh13120/gridpact/blob/main/docs/AGENT_GUIDE.md"],
                     ["Our slides in the shared Demo Day deck", Paragraph(deck, CELL)],
                     ["Code (GridPact)", "github.com/nh13120/gridpact"],
                     ["HW8 pull request (Nanda Town)", "github.com/projnanda/nandatown/pull/345"],
