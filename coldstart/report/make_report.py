@@ -44,7 +44,7 @@ def p(t, st=B):
 
 def runs():
     out = {}
-    for i in range(1, 6):
+    for i in range(1, 7):
         f = ROOT / "coldstart" / "runs" / f"run{i}" / "score.json"
         if f.exists():
             out[i] = json.loads(f.read_text())["checks"]
@@ -68,7 +68,8 @@ def build(deck_url, out):
     deck = f'<a href="{deck_url}" color="#00a65a">{deck_url}</a>' if deck_url else "[paste the link to our slides in the shared Demo Day deck here]"
     sc = runs()
     n = max(sc)
-    run5 = (HERE / "run5_paragraph.txt").read_text().strip() if (HERE / "run5_paragraph.txt").exists() else "[run 5 paragraph missing]"
+    run5 = (HERE / "run5_paragraph.txt").read_text().strip()
+    run6 = (HERE / "run6_paragraph.txt").read_text().strip()
     tot = {i: (sum(1 for v in c.values() if v), len(c)) for i, c in sc.items()}
     S = []
     S += [p("GridPact: agent usability and final project slides", H1),
@@ -108,10 +109,10 @@ def build(deck_url, out):
             "as a buyer (COM_09), an honest seller (PVB_17) and an auditor (AUD_1), each with its own logging proxy in front of one GridPact server on the synthetic registry. "
             "Each was given the guide, its URL and a one-paragraph task. No call sequence and no expected answer were given; the author passed no messages between them. "
             "They coordinated only through GridPact. In runs 1 to 4 the auditor was also authorised to read the public registry file, because the nameplate was only there; "
-            "in run 5 it was not (see section 3). A seller PVB_37, which declares 5,000 kW for a 2,500 kW battery, was registered by its owner as part of the setup, with a "
+            "from run 5 on it was not (see section 3). A seller PVB_37, which declares 5,000 kW for a 2,500 kW battery, was registered by its owner as part of the setup, with a "
             "small script that accepts any offer made to it."),
           p("<b>Success defined before the run.</b> coldstart/PLAN.md (commit 74055c8, before run 1) fixes the task texts and 15 checks; B8 was added before run 4 and A4 before run 5, "
-            "each in PLAN.md before its run. They are scored from the database and the proxy logs, not from what a client says:")]
+            "each in PLAN.md before its run, and run 6 changed only the buyer's wording, also in PLAN.md before it. They are scored from the database and the proxy logs, not from what a client says:")]
     rows = [["#", "Check"] + [f"Run {i}" for i in sc]]
     for k, d in CHECKS:
         r = [k, Paragraph(d, CELL)]
@@ -119,7 +120,7 @@ def build(deck_url, out):
             r.append("PASS" if c.get(k) else "FAIL") if k in c else r.append("not scored")
         rows.append(r)
     rows.append(["", Paragraph("<b>Checks passed</b>", CELL)] + [f"{a} of {b}" for a, b in tot.values()])
-    S.append(table(rows, [22, 240] + [48] * len(sc), align_center_from=2))
+    S.append(table(rows, [22, 204] + [44] * len(sc), align_center_from=2))
     S += [Spacer(1, 4), p("What the clients did, and how they used the result", H2),
           p("In run 1 the buyer registered, listed sellers, proposed 1,250 kWh/step to PVB_37 and 250 to PVB_17 at $50/MWh, polled its inbox until both were accepted "
             "(about a minute), and reported 18,000 kWh for $900. The seller polled for the full ten minutes and accepted the one offer that fit. The auditor wrote its own "
@@ -152,7 +153,7 @@ def build(deck_url, out):
             "plus the range probe): the auditor's valid challenge cut PVB_37 from 750 to 625 kWh/step; the buyer's next call returned a notice saying so, it bought the missing "
             "125 kWh/step from PVB_17, re-read get_commitments, and reported 18,000 kWh and $990, matching the database. The same failure mode as run 2 (a buyer that keeps "
             "making other calls) now ends correctly."),
-          p(run5)]
+          p(run5), p(run6)]
 
     S += [p("What improved, what did not, what is unproven", H2),
           p("<b>Improved:</b> an agent can see a cut and is told about it on whatever call it makes next; an auditor can compare a claim with the real battery through the tools; "

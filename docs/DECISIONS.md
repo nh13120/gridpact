@@ -81,3 +81,7 @@ A retried `propose` used to open a second offer and accepting both double-booked
   task-wording problem, check not changed, run not repeated. Run 5 also showed that a notice helps only an agent that reads the field (the buyer's next call carried
   it; the buyer ignored it on that reply), so the guide now says to read `notices` on every reply. `coldstart/runs/*` logs are now tracked (databases and
   server logs are not; operator keys redacted). Not done: a real independent client (another builder's agent).
+- 2026-11-17, run 6: run 5's one miss (B7) was the task wording (`total_kwh` did not say "over the whole window"). Plan written first (PLAN.md), then run 5 repeated with
+  fresh clients and only that wording changed: 17 of 17. Both runs are reported side by side; no check was changed. The guide edits made after run 5 (read `notices` on every
+  reply, global ids, no "done" signal) were exercised once in run 6 (the buyer read the notice). Slides now use only real-AI results (the benchmark's Haiku agents and the
+  fresh-agent test); the scripted 1,520-agent scale test stays in `benchmark/README.md` but is not claimed on a slide.

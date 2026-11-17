@@ -160,3 +160,12 @@ tasks, with exactly one change to the buyer's task text: the JSON line now reads
 number of steps, summed over your commitments), "total_cost_usd": ..`. No check, tool, guide text or other task text changes. Expected, written now:
 B7 passes if the buyer's report matches the database; everything else as in run 5. This is a test-setup fix, disclosed as such. If run 6 fails any check, it is
 reported as it is. Runs 5 and 6 are kept side by side; neither replaces the other.
+
+## Run 6 result (appended after the run)
+
+17 of 17 checks, including B7: the buyer reported 18,000 kWh and $990, matching the database (commitments 625 + 250 + 625 kWh/step at $55 over 12 steps). The auditor,
+again told to read nothing but the guide, called `get_registry`, challenged PVB_37 once (valid, $90) and left PVB_17 alone; the buyer saw the cut in the `notices` of its
+next call and bought the missing volume from PVB_17. Run 6 used the guide as edited after run 5 (read `notices` on every reply; ids are global; no "done" signal), so those
+edits have now been exercised once. Disclosed: this pass followed a change to the buyer's task wording, a test-setup fix; run 5's 16 of 17 stays in the record next to it.
+It is one run per condition: no success rate is claimed. The auditor stopped polling after about 80 s, once both existing commitments were checked; a later commitment
+would not have been seen. Test bed stopped after scoring, every offer to the seller answered.
