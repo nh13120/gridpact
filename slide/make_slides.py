@@ -122,10 +122,10 @@ def build(checks):
     s.save("slide3.png")
 
     # 4: worked, failed, next
-    s = Slide(4, "WORKED  ·  FAILED  ·  NEXT")
+    s = Slide(4, "WORKED  ·  IMPROVE  ·  NEXT")
     s.text(60, 120, "What we learned.", hn(70, LIGHT))
     cols = [("Worked", GREEN, ["Lying loses money.", "Pre-registered tests, then reruns that passed.", "A fresh agent used it from the guide."]),
-            ("Failed", INK, ["A second liar can slip through at scale.", "Delivery is estimated, not metered.", "Only one kind of lie tested."]),
+            ("To improve", INK, ["Catch a second liar at scale.", "Measure delivery instead of estimating it.", "Test more kinds of lies."]),
             ("Next", INK, ["A second audit pass.", "Live meter data.", "A pilot with one ENGIE community."])]
     for i, (h, col, items) in enumerate(cols):
         x = 64 + i * 400
