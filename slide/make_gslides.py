@@ -92,7 +92,7 @@ def build(checks):
     s = new_slide(prs, "THE PROBLEM", 79)
     text(s, 60, 138, 1100, 190, ["Soon, AI agents will", "trade electricity."], 72, INK)
     text(s, 60, 318, 1100, 70, "What if one of them lies?", 48, GREEN)
-    text(s, 64, 402, 980, 110, "A battery owner promises power for 5 pm. A community plans around that promise. "
+    text(s, 64, 402, 1060, 110, "A battery owner promises power for 5 pm. A community plans around that promise. "
          "No person can check every deal, so AI agents will make them on their own, in seconds, with real money at stake.", 23, INK)
     for i, (h, t) in enumerate([("Buyer", "a community that needs power"), ("Seller", "a battery owner who promises it"),
                                 ("Auditor", "an AI that checks the promise")]):
